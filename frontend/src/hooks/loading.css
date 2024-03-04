@@ -1,0 +1,20 @@
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo meio opaco */
+  z-index: 999; /* Coloca o loading acima do restante da aplicação */
+  visibility: hidden; /* Torna inicialmente invisível */
+  opacity: 0; /* Torna inicialmente transparente */
+  transition: visibility 0s, opacity 0.5s ease; /* Adiciona uma transição suave */
+}
+
+.loading-active {
+  visibility: visible; /* Torna visível quando está ativo (loading) */
+  opacity: 1; /* Torna totalmente opaco quando está ativo (loading) */
+}

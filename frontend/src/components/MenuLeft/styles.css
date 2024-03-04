@@ -1,0 +1,23 @@
+.logo {
+  height: 200px;
+}
+
+/* Adicione os estilos de hover apenas para itens não selecionados */
+.ant-menu-item:not(.selected-item):hover {
+  border-left: 3px solid #056530; /* Adapte a cor conforme necessário */
+}
+
+.ant-menu-item {
+  border-radius: 0px !important;
+}
+
+.ant-menu-item-selected {
+  background-color: white !important;
+  border-left: 3px solid #056530;
+}
+
+:where(.css-dev-only-do-not-override-13ckvny).ant-menu .ant-menu-item,
+:where(.css-dev-only-do-not-override-13ckvny).ant-menu .ant-menu-submenu,
+:where(.css-dev-only-do-not-override-13ckvny).ant-menu .ant-menu-submenu-title {
+  border-radius: 0px !important;
+}
