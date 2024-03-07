@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Input,
@@ -10,15 +10,15 @@ import {
   Typography,
   Modal,
   Form,
+  message,
+  Popconfirm,
 } from "antd";
-import {
-  DeleteOutlined,
-  InfoOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, InfoOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
+import { get, post, put, remove } from "../../../api/axios";
 
 interface DataType {
   key: React.Key;
@@ -29,32 +29,92 @@ interface DataType {
 
 const Equipamentos: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
-
+  const [entityToEdit, setEntityToEdit] = useState<any>();
+  const [equipamentos, setEquipamentos] = useState<any[]>([]);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState<boolean>();
 
   const showModal = () => {
     setIsOpenModal(true);
   };
 
-  const handleCancel = () => {
+  const handleCancel = async ()=> {
+    // Limpar o formulário
+    await form.resetFields();
+    setEntityToEdit(null);
+    resetFields(null)
     setIsOpenModal(false);
   };
 
-  const handleOk = () => {
-    form.validateFields().then((values) => {
-      // Aqui você pode lidar com os valores do formulário
-      console.log(values);
-      // Limpar o formulário
-      form.resetFields();
-      setIsOpenModal(false);
-    });
+  const resetFields = (entity: any) => {
+    form.setFieldValue("descricao", entity ? entity.descricao : "");
   };
+
+  const getEquipamentos = async () => {
+    try {
+      const response: any[] = await get("equipamentos");
+      setEquipamentos(response);
+    } catch (error) {
+      //
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    getEquipamentos();
+  }, []);
+
+  const handleOk = async () => {
+    try {
+      await form.validateFields();
+
+      let values = {
+        descricao: form.getFieldValue("descricao"),
+        id: entityToEdit ? entityToEdit.id : null,
+      };
+
+      if (!entityToEdit) {
+        const response = await post("equipamentos/create", values);
+        setEquipamentos(equipamentos.concat(response));
+        message.success("Equipamento criado com sucesso");
+      } else {
+        const response = await put(
+          `equipamentos/update/${entityToEdit.id}`,
+          values
+        );
+        let newEquipamentos = [...equipamentos];
+        let i = equipamentos.findIndex((x) => x.id == entityToEdit.id);
+        newEquipamentos[i] = response;
+        setEquipamentos(newEquipamentos);
+        message.success("Equipamento editado com sucesso");
+      }
+      
+
+      handleCancel()
+    } catch (error) {
+      console.error("Erro ao processar o formulário:", error);
+      // Aqui você pode adicionar lógica para lidar com o erro, se necessário
+    }
+  };
+
+  const onDelete = async (id: number) => {
+    try {
+      await remove(`equipamentos/delete/${id}`);
+      message.success("Equiapamento excluído com sucesso!");
+      setEquipamentos(equipamentos.filter(x => x.id != id));
+    }
+    catch (error) {
+
+    }
+  }
 
   const columns: ColumnsType<DataType> = [
     {
       title: "Nome",
-      dataIndex: "nome",
-      sorter: (a: any, b: any) => a.nome.length - b.nome.length,
+      dataIndex: "descricao",
+      sorter: (a: any, b: any) => a.descricao.length - b.descricao.length,
       sortDirections: ["descend"],
     },
     {
@@ -63,22 +123,34 @@ const Equipamentos: React.FC = () => {
       render: (acao, record: any) => (
         <Space size="middle">
           <Tooltip title="Excluir">
-            <Button
-              className="senai-btn-danger"
-              shape="circle"
-              onClick={() => {}}
+            <Popconfirm
+              title="Excluir"
+              description="Tem certeza que deseja excluir este equipamento?"
+              onConfirm={() => onDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
             >
-              <DeleteOutlined className="senai-icon" />
-            </Button>
+              <Button
+                className="ifes-btn-danger"
+                shape="circle"
+                onClick={() => {}}
+              >
+                <DeleteOutlined className="ifes-icon" />
+              </Button>
+            </Popconfirm>
           </Tooltip>
 
-          <Tooltip title="Detalhes">
+          <Tooltip title="Editar">
             <Button
-              className="senai-btn-info"
+              className="ifes-btn-warning"
               shape="circle"
-              onClick={() => {}}
+              onClick={() => {
+                setEntityToEdit(record);
+                resetFields(record);
+                setIsOpenModal(true);
+              }}
             >
-              <InfoOutlined className="senai-icon" />
+              <EditOutlined className="ifes-icon" />
             </Button>
           </Tooltip>
         </Space>
@@ -94,16 +166,11 @@ const Equipamentos: React.FC = () => {
       <CardFooter>
         <div className="flex justify-content-between">
           {/* Filtros */}
-          <div className="flex filtros-card">
-          
-          </div>
+          <div className="flex filtros-card"></div>
 
           <div>
-            <Button
-              className="senai-btn-success"
-              onClick={showModal}
-            >
-              <PlusOutlined className="senai-icon" />
+            <Button className="ifes-btn-success" onClick={showModal}>
+              <PlusOutlined className="ifes-icon" />
               Adicionar
             </Button>
           </div>
@@ -111,7 +178,7 @@ const Equipamentos: React.FC = () => {
       </CardFooter>
 
       {/* Tabela */}
-      <Table columns={columns} dataSource={[]} />
+      <Table columns={columns} dataSource={equipamentos} loading={loading} />
 
       {/* Modal */}
       <Modal
@@ -122,7 +189,7 @@ const Equipamentos: React.FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="nome"
+            name="descricao"
             label="Nome"
             rules={[{ required: true, message: "Por favor, insira o nome!" }]}
           >

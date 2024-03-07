@@ -1,5 +1,5 @@
 export enum FeatureCodeEnum{
-    USERS = 'SENAI.USERS'
+    USERS = 'ifes.USERS'
 }
 
 export enum FeatureCodeAction {

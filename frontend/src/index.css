@@ -9,42 +9,42 @@
   --colorDanger: #DC2626;
 }
 
-.senai-btn-primary {
+.ifes-btn-primary {
   background-color: var(--colorPrimary) !important;
   color: white;
 }
 
-.senai-btn-secondary {
+.ifes-btn-secondary {
   background-color: var(--colorSecondary) !important;
   color: white;
 }
 
-.senai-btn-success {
+.ifes-btn-success {
   background-color: var(--colorSuccess) !important;
   color: white;
 }
 
-.senai-btn-info {
+.ifes-btn-info {
   background-color: var(--colorInfo) !important;
   color: white;
 }
 
-.senai-btn-warning {
+.ifes-btn-warning {
   background-color: var(--colorWarning) !important;
   color: white;
 }
 
-.senai-btn-help {
+.ifes-btn-help {
   background-color: var(--colorHelp) !important;
   color: white;
 }
 
-.senai-btn-danger {
+.ifes-btn-danger {
   background-color: var(--colorDanger) !important;
   color: white;
 }
 
-.senai-icon{
+.ifes-icon{
   font-size: 18px;
 }
 

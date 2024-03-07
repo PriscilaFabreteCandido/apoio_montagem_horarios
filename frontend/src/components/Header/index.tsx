@@ -115,7 +115,7 @@ function Header({ onIconClick }: any) {
   return (
     <>
       <div
-        className="header-senai flex"
+        className="header-ifes flex"
         style={{ justifyContent: "space-between", padding: "0 1.85rem" }}
       >
         <div>
