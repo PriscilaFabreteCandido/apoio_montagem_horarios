@@ -11,7 +11,7 @@
 .root-layout {
   display: grid;
   grid-template-areas:
-    "nav header header"
+    "header header header"
     "nav main main"
     "nav main main";
   grid-template-rows: var(--nav-height) var(--main-height) var(--main-height);

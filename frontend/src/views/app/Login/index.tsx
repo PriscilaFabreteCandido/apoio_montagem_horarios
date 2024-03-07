@@ -19,7 +19,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const realizarLogin = (event: any) => {
-    event.preventDefault();
+    //event.preventDefault();
     navigate("/Inicio");
     useProvideAuth.signin(password, username);
   };

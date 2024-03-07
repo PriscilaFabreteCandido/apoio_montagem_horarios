@@ -63,23 +63,23 @@ function getItem(
 
 const items: MenuProps["items"] = [
   getItem("Início", "inicio", <HomeOutlined />, "/Inicio"),
-  getItem("PCSMO", "pcmso", <WarningOutlined />, "/PCMSO"),
-  getItem("Equipe de Execução", "equipeexecucao", <CheckCircleOutlined />, "/Cadastros", 
+  getItem("Cadastros", "cadastros", <CheckCircleOutlined />, "/Cadastros", 
   [
-    getItem("Voluntários", "voluntario", <UsergroupAddOutlined />, "/Cadastros/Usuários"),
-    getItem("Bolsistas", "bolsistas", <BookOutlined   />, "/Cadastros/Exames"),
-    getItem("Servidores", "servidores", <CloudServerOutlined   />, "/Cadastros/Exames"),
+    getItem("Local", "local", <UsergroupAddOutlined />, "/Cadastros/Usuários"),
+    getItem("Equipamentos", "equipamento", <BookOutlined   />, "/Cadastros/Equipamentos"),
+    getItem("Coordenadoria", "coordenadoria", <CloudServerOutlined   />, "/Cadastros/Exames"),
+    getItem("Professores", "professores", <CloudServerOutlined   />, "/Cadastros/Exames"),
+    getItem("Coordenadores de turno", "coordenadoresTurno", <CloudServerOutlined   />, "/Cadastros/Exames"),
+    getItem("Semestre Letivos", "semestreLetivo", <CloudServerOutlined   />, "/Cadastros/Exames"),
   ],
   ),
-  getItem("Documentos", "consultas", <FileTextOutlined />, "/Consultas",
+  getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas",
   [
     getItem("Relatórios", "voluntario", <BarChartOutlined />, "/Cadastros/Usuários"),
     getItem("Ano", "ano", <CalendarOutlined   />, "/Cadastros/Exames"),
     getItem("Anexar Documentos", "servidores", <PaperClipOutlined   />, "/Cadastros/Exames"),
   ],),
-  getItem("Ações", "acoes", <PlayCircleOutlined />, "/PGR"),
-  getItem("Perguntas Frequentes", "perguntasfrequentes", <QuestionCircleOutlined />, "/Perguntas Frequentes"),
-  
+  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR"),
 ];
 
 function MenuLeft({ isIconClicked }: any) {
@@ -118,7 +118,8 @@ function MenuLeft({ isIconClicked }: any) {
     }
   }
   
-  const onClick: MenuProps["onClick"] = (e) => {
+  const onClick: MenuProps["onClick"] = (e: any) => {
+    //e.preventDefault();
     var selectedItem: any = encontrarItemDoMenu(items ?  items : [], e.key);
     if (selectedItem && selectedItem.uri) {
       navigate(selectedItem.uri);
