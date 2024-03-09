@@ -137,11 +137,14 @@ function MenuLeft({ isIconClicked }: any) {
         }}
         className="logo"
       >
-        <img
-          src={isIconClicked ? transferir: logo}
-          alt="Descrição da imagem"
-          style={{ width: "100%", height: "100%" }}
-        />
+        
+  <img
+      src={isIconClicked ? transferir : logo}
+      alt="Descrição da imagem"
+      style={{ width: "100%", height: "auto", marginTop: "10px" }}
+  />
+
+
       </div>
 
       {defaultSelectedKeys && defaultSelectedKeys.length > 0 && (
