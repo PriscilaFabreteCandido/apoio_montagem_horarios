@@ -2,18 +2,18 @@ package br.com.sistema.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Entity
-public class Equipamento {
+public class Local {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descricao;
+    private String capacidade;
 
-    @ManyToOne
-    @JoinColumn(name = "id_local")
-    private Local local;
+    @OneToMany(mappedBy = "local" , cascade = CascadeType.ALL)
+    private List<Equipamento> equipamentos;
 }
