@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { ConfigProvider, ThemeConfig } from "antd";
 import ptBR from "antd/lib/locale/pt_BR"; // Importar o pacote de idioma pt-BR
 import { AuthProvider } from "./context/AuthProvider";
-//import 'antd/dist/reset.css';
+
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

@@ -22,9 +22,7 @@ import { get, post, put, remove } from "../../../api/axios";
 
 interface DataType {
   key: React.Key;
-  id: number;
-  codigoESocial: string;
-  exame: string;
+  descricao: string;
 }
 
 const Equipamentos: React.FC = () => {

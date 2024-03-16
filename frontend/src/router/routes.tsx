@@ -5,9 +5,12 @@ import Login from "../views/app/Login";
 import Logout from "../views/app/Logout";
 
 import Consultas from "../views/Consultas";
-import Relatorios from "../views/Relatorios";
+import Relatorios from "../views/Alocacoes";
 import Error404 from "../components/404";
 import Equipamentos from "../views/Cadastros/Equipamento";
+import SemestresLetivos from "../views/Cadastros/SemestreLetivo";
+import Locais from "../views/Cadastros/Equipamento";
+import Alocacoes from "../views/Alocacoes";
 
 export interface RouteConfig {
   path: string;
@@ -41,6 +44,14 @@ const routes: RouteConfig[] = [
       //Relatórios
       { path: "Relatórios", element: <Relatorios />, permissions: "" },
 
+      //Semestre Letivo
+      { path: "Cadastros/Semestres Letivos", element: <SemestresLetivos />, permissions: "" },
+      
+      //Locais
+      { path: "Cadastros/Locais", element: <Locais />, permissions: "" },
+
+      //Eventos 
+      { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       {
         path: "*",
         permissions: "",

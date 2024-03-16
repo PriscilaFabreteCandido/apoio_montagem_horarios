@@ -65,21 +65,20 @@ const items: MenuProps["items"] = [
   getItem("Início", "inicio", <HomeOutlined />, "/Inicio"),
   getItem("Cadastros", "cadastros", <CheckCircleOutlined />, "/Cadastros", 
   [
-    getItem("Local", "local", <UsergroupAddOutlined />, "/Cadastros/Usuários"),
+    getItem("Locais", "Locais", <UsergroupAddOutlined />, "/Cadastros/Locais"),
     getItem("Equipamentos", "equipamento", <BookOutlined   />, "/Cadastros/Equipamentos"),
     getItem("Coordenadoria", "coordenadoria", <CloudServerOutlined   />, "/Cadastros/Exames"),
     getItem("Professores", "professores", <CloudServerOutlined   />, "/Cadastros/Exames"),
     getItem("Coordenadores de turno", "coordenadoresTurno", <CloudServerOutlined   />, "/Cadastros/Exames"),
-    getItem("Semestre Letivos", "semestreLetivo", <CloudServerOutlined   />, "/Cadastros/Exames"),
+    getItem("Semestre Letivos", "semestreLetivo", <CloudServerOutlined   />, "/Cadastros/Semestres Letivos"),
   ],
   ),
-  getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas",
+  getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas"),
+  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR",
   [
-    getItem("Relatórios", "voluntario", <BarChartOutlined />, "/Cadastros/Usuários"),
-    getItem("Ano", "ano", <CalendarOutlined   />, "/Cadastros/Exames"),
-    getItem("Anexar Documentos", "servidores", <PaperClipOutlined   />, "/Cadastros/Exames"),
+    getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
+    getItem("Próxima aula", "proximaAula", <CalendarOutlined   />, "/Cadastros/Próxima aula"),
   ],),
-  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR"),
 ];
 
 function MenuLeft({ isIconClicked }: any) {
