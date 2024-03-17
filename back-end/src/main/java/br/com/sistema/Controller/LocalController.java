@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/local")
+@RequestMapping("/api/locais")
 public class LocalController {
 
     private final LocalService localService;

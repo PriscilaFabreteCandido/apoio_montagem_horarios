@@ -1,9 +1,9 @@
 package br.com.sistema.Repository;
 
-import br.com.sistema.Model.Local;
+import br.com.sistema.Model.Evento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LocalRepository extends JpaRepository<Local, Long> {
+public interface EventoRepository extends JpaRepository<Evento, Long>{
 }

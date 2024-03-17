@@ -43,7 +43,7 @@ public class EquipamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EquipamentoDTO>> findAllEqEquipments(){
+    public ResponseEntity<List<EquipamentoDTO>> findAllEquipments(){
         List<EquipamentoDTO> equipamentList = equipamentoService.findAll();
         return new ResponseEntity<>(equipamentList, equipamentList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
