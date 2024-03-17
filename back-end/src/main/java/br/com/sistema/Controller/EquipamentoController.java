@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "AtorController")
+@Tag(name = "EquipamentoController")
 
 @RestController
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class EquipamentoController {
 
     @GetMapping
     public ResponseEntity<List<EquipamentoDTO>> findAllEqEquipments(){
-        List<EquipamentoDTO> productList = equipamentoService.findAll();
-        return new ResponseEntity<>(productList, productList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+        List<EquipamentoDTO> equipamentList = equipamentoService.findAll();
+        return new ResponseEntity<>(equipamentList, equipamentList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 }

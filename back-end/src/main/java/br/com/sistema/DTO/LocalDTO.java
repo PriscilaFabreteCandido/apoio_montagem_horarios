@@ -7,6 +7,7 @@ import java.util.List;
 public class LocalDTO {
 
     private Long id;
-    private String capacidade;
-    private List<EquipamentoDTO> equipamentos;
+    private String descricao;
+    private Integer capacidade;
+    private List<LocalEquipamentoDTO> equipamentos;
 }

@@ -1,6 +1,8 @@
 package br.com.sistema.Controller;
 
+import br.com.sistema.DTO.EquipamentoDTO;
 import br.com.sistema.DTO.LocalDTO;
+import br.com.sistema.DTO.LocalEquipamentoDTO;
 import br.com.sistema.Service.LocalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+@Tag(name = "LocalController")
 
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +46,7 @@ public class LocalController {
 
     @GetMapping
     public ResponseEntity<List<LocalDTO>> findAllLocais(){
-        List<LocalDTO> productList = localService.findAll();
-        return new ResponseEntity<>(productList, productList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+        List<LocalDTO> localList = localService.findAll();
+        return new ResponseEntity<>(localList, localList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 }
