@@ -22,9 +22,9 @@ public class EventoService {
     private final EventoMapper mapper;
 
     public EventoDTO create(EventoDTO eventoDTO){
-        System.out.println(eventoDTO);
+
         Evento entity = mapper.toEntity(eventoDTO);
-        System.out.println("entity: " + entity);
+
         repository.save(entity);
 
         return mapper.toDto(entity);

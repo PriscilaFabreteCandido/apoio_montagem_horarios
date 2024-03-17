@@ -1,8 +1,9 @@
 package br.com.sistema.Enum;
 
 public enum PeriodoSemestreEnum {
-    PRIMEIRO_PERIODO("1° período"),
-    SEGUNDO_PERIODO("2° período");
+    PRIMEIRO_PERIODO("1"),
+    SEGUNDO_PERIODO("2"),
+    NENHUM("-");
 
     private final String descricao;
 
@@ -13,5 +14,7 @@ public enum PeriodoSemestreEnum {
     public String getDescricao() {
         return descricao;
     }
+
+
 
 }
