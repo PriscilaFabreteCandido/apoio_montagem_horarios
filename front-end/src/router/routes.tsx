@@ -9,7 +9,7 @@ import Relatorios from "../views/Alocacoes";
 import Error404 from "../components/404";
 import Equipamentos from "../views/Cadastros/Equipamento";
 import SemestresLetivos from "../views/Cadastros/SemestreLetivo";
-import Locais from "../views/Cadastros/Equipamento";
+import Locais from "../views/Cadastros/local";
 import Alocacoes from "../views/Alocacoes";
 
 export interface RouteConfig {

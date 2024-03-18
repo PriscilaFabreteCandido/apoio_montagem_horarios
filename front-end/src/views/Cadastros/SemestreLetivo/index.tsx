@@ -8,6 +8,7 @@ import {
   Form,
   message,
   Popconfirm,
+  Select
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
@@ -15,21 +16,24 @@ import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
 
-interface SemestreType {
+
+interface PeriodoAcademicoType {
   key: React.Key;
   id: number;
   ano: number;
-  semestre: string;
-  data_fim: string;
-  data_inicio: string;
+  dataInicio: string;
+  dataFim: string;
+  formato: string;
+  periodo: string;
 }
 
-const SemestresLetivos: React.FC = () => {
+const PeriodosAcademicos: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [semestreToEdit, setSemestreToEdit] = useState<SemestreType | null>(null);
-  const [semestres, setSemestres] = useState<SemestreType[]>([]);
+  const [periodoToEdit, setPeriodoToEdit] = useState<PeriodoAcademicoType | null>(null);
+  const [periodos, setPeriodos] = useState<PeriodoAcademicoType[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
+  const [formato, setFormato] = useState<string | undefined>(undefined);
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -37,25 +41,28 @@ const SemestresLetivos: React.FC = () => {
 
   const handleCancel = () => {
     form.resetFields();
-    setSemestreToEdit(null);
+    setPeriodoToEdit(null);
     setIsOpenModal(false);
   };
 
-  const getSemestres = async () => {
+  const handleFormatoChange = (value: string) => {
+    setFormato(value);
+  };
+
+  const getPeriodos = async () => {
     setLoading(true);
     try {
-      const response: SemestreType[] = await get("semestres");
-      setSemestres(response);
+      const response: PeriodoAcademicoType[] = await get("periodos");
+      setPeriodos(response);
     } catch (error) {
-      // Lidar com erros de requisição
-      console.error("Erro ao obter semestres:", error);
+      console.error("Erro ao obter períodos acadêmicos:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getSemestres();
+    getPeriodos();
   }, []);
 
   const handleOk = async () => {
@@ -63,22 +70,23 @@ const SemestresLetivos: React.FC = () => {
       await form.validateFields();
       const values = form.getFieldsValue();
       
-      const semestreData = {
+      const periodoData = {
         ano: values.ano,
-        semestre: values.semestre,
-        data_inicio: values.data_inicio,
-        data_fim: values.data_fim,
-        id: semestreToEdit ? semestreToEdit.id : null,
+        dataInicio: values.dataInicio,
+        dataFim: values.dataFim,
+        formato: values.formato,
+        periodo: values.periodo,
+        id: periodoToEdit ? periodoToEdit.id : null,
       };
 
-      if (!semestreToEdit) {
-        const response = await post("semestres/create", semestreData);
-        setSemestres([...semestres, response]);
-        message.success("Semestre letivo criado com sucesso");
+      if (!periodoToEdit) {
+        const response = await post("periodos/create", periodoData);
+        setPeriodos([...periodos, response]);
+        message.success("Período acadêmico criado com sucesso");
       } else {
-        const response = await put(`semestres/update/${semestreToEdit.id}`, semestreData);
-        setSemestres(semestres.map(semestre => (semestre.id === response.id ? response : semestre)));
-        message.success("Semestre letivo editado com sucesso");
+        const response = await put(`periodos/update/${periodoToEdit.id}`, periodoData);
+        setPeriodos(periodos.map(periodo => (periodo.id === response.id ? response : periodo)));
+        message.success("Período acadêmico editado com sucesso");
       }
 
       handleCancel();
@@ -89,32 +97,36 @@ const SemestresLetivos: React.FC = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await remove(`semestres/delete/${id}`);
-      setSemestres(semestres.filter(semestre => semestre.id !== id));
-      message.success("Semestre letivo excluído com sucesso");
+      await remove(`periodos/delete/${id}`);
+      setPeriodos(periodos.filter(periodo => periodo.id !== id));
+      message.success("Período acadêmico excluído com sucesso");
     } catch (error) {
-      // Lidar com erros de exclusão
-      console.error("Erro ao excluir semestre letivo:", error);
+      console.error("Erro ao excluir período acadêmico:", error);
     }
   };
 
-  const columns: ColumnsType<SemestreType> = [
+
+  const columns: ColumnsType<PeriodoAcademicoType> = [
     {
       title: "Ano",
       dataIndex: "ano",
       sorter: (a, b) => a.ano - b.ano,
     },
     {
-      title: "Semestre",
-      dataIndex: "semestre",
-    },
-    {
       title: "Data de Início",
-      dataIndex: "data_inicio",
+      dataIndex: "dataInicio",
     },
     {
       title: "Data de Fim",
-      dataIndex: "data_fim",
+      dataIndex: "dataFim",
+    },
+    {
+      title: "Formato",
+      dataIndex: "formato",
+    },
+    {
+      title: "Período",
+      dataIndex: "periodo",
     },
     {
       title: "Ações",
@@ -122,7 +134,7 @@ const SemestresLetivos: React.FC = () => {
       render: (_, record) => (
         <Tooltip title="Excluir">
           <Popconfirm
-            title="Tem certeza que deseja excluir este semestre?"
+            title="Tem certeza que deseja excluir este período acadêmico?"
             onConfirm={() => onDelete(record.id)}
             okText="Sim"
             cancelText="Cancelar"
@@ -151,11 +163,11 @@ const SemestresLetivos: React.FC = () => {
       </CardFooter>
 
       {/* Tabela */}
-      <Table columns={columns} dataSource={semestres} loading={loading} />
+      <Table columns={columns} dataSource={periodos} loading={loading} />
 
       {/* Modal */}
       <Modal
-        title="Adicionar Semestre Letivo"
+        title="Adicionar Período Acadêmico"
         visible={isOpenModal}
         onOk={handleOk}
         onCancel={handleCancel}
@@ -169,21 +181,38 @@ const SemestresLetivos: React.FC = () => {
             <Input type="number" />
           </Form.Item>
           <Form.Item
-            name="semestre"
-            label="Semestre"
-            rules={[{ required: true, message: "Por favor, insira o semestre!" }]}
+            name="formato"
+            label="Formato"
+            rules={[{ required: true, message: "Por favor, insira o formato!" }]}
           >
-            <Input />
+            <Select onChange={handleFormatoChange}>
+              <Select.Option value="ANUAL">Anual</Select.Option>
+              <Select.Option value="SEMESTRAL">Semestral</Select.Option>
+            </Select>
           </Form.Item>
+          {formato === "SEMESTRAL" && (
+            <>
+              <Form.Item
+                name="periodo"
+                label="Período"
+                rules={[{ required: true, message: "Por favor, insira o período!" }]}
+              >
+                <Select>
+                  <Select.Option value="1">1º Semestre</Select.Option>
+                  <Select.Option value="2">2º Semestre</Select.Option>
+                </Select>
+              </Form.Item>
+            </>
+          )}
           <Form.Item
-            name="data_inicio"
+            name="dataInicio"
             label="Data de Início"
             rules={[{ required: true, message: "Por favor, insira a data de início!" }]}
           >
             <Input type="date" />
           </Form.Item>
           <Form.Item
-            name="data_fim"
+            name="dataFim"
             label="Data de Fim"
             rules={[{ required: true, message: "Por favor, insira a data de fim!" }]}
           >
@@ -195,4 +224,4 @@ const SemestresLetivos: React.FC = () => {
   );
 };
 
-export default SemestresLetivos;
+export default PeriodosAcademicos;
