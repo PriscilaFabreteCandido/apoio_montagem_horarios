@@ -22,9 +22,9 @@ interface DataType {
   key: React.Key;
   id: number;
   descricao: string;
-  dia: string;
-  inicio: string;
-  termino: string;
+  data: string;
+  horaInicio: string;
+  horaFim: string;
 }
 
 const Alocacoes: React.FC = () => {
@@ -53,7 +53,7 @@ const Alocacoes: React.FC = () => {
   const getAlocacoes = async () => {
     try {
       setLoading(true);
-      const response: any[] = await get("alocacoes");
+      const response: any[] = await get("eventos");
       setAlocacoes(response);
     } catch (error) {
       console.error("Erro ao obter alocações:", error);
@@ -73,14 +73,14 @@ const Alocacoes: React.FC = () => {
 
       let data = {
         descricao: values.descricao,
-        dia: values.dia,
-        inicio: values.inicio,
-        termino: values.termino,
+        data: values.data.format("YYYY-MM-DD"),
+        horaInicio: values.horaInicio.format("HH:mm:ss"),
+        horaFim: values.horaFim.format("HH:mm:ss"),
         id: entityToEdit ? entityToEdit.id : null,
       };
 
       if (!entityToEdit) {
-        const response = await post("alocacoes/create", data);
+        const response = await post("eventos/create", data);
         setAlocacoes([...alocacoes, response]);
         message.success("Alocação criada com sucesso");
       } else {
@@ -101,7 +101,7 @@ const Alocacoes: React.FC = () => {
 
   const onDelete = async (id: number) => {
     try {
-      await remove(`alocacoes/delete/${id}`);
+      await remove(`eventos/delete/${id}`);
       setAlocacoes(alocacoes.filter((alocacao) => alocacao.id !== id));
       message.success("Alocação excluída com sucesso");
     } catch (error) {
@@ -117,15 +117,15 @@ const Alocacoes: React.FC = () => {
     },
     {
       title: "Dia",
-      dataIndex: "dia",
+      dataIndex: "data",
     },
     {
       title: "Início",
-      dataIndex: "inicio",
+      dataIndex: "horaInicio",
     },
     {
       title: "Término",
-      dataIndex: "termino",
+      dataIndex: "horaFim",
     },
     {
       title: "Ações",
@@ -184,14 +184,14 @@ const Alocacoes: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            name="dia"
+            name="data"
             label="Dia"
             rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
           <Form.Item
-            name="inicio"
+            name="horaInicio"
             label="Início"
             rules={[
               {
@@ -203,7 +203,7 @@ const Alocacoes: React.FC = () => {
             <TimePicker format="HH:mm:ss" />
           </Form.Item>
           <Form.Item
-            name="termino"
+            name="horaFim"
             label="Término"
             rules={[
               {
