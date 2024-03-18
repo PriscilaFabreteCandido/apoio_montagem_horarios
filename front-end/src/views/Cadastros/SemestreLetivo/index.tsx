@@ -8,7 +8,8 @@ import {
   Form,
   message,
   Popconfirm,
-  Select
+  Select,
+  Space
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
@@ -47,7 +48,12 @@ const PeriodosAcademicos: React.FC = () => {
 
   const handleFormatoChange = (value: string) => {
     setFormato(value);
+    // Limpar o valor do campo "Período" se o formato for "SEMESTRAL"
+    if (value === 'SEMESTRAL') {
+      form.setFieldsValue({ periodo: '' });
+    }
   };
+  
 
   const getPeriodos = async () => {
     setLoading(true);
@@ -132,20 +138,49 @@ const PeriodosAcademicos: React.FC = () => {
       title: "Ações",
       key: "actions",
       render: (_, record) => (
-        <Tooltip title="Excluir">
-          <Popconfirm
-            title="Tem certeza que deseja excluir este período acadêmico?"
-            onConfirm={() => onDelete(record.id)}
-            okText="Sim"
-            cancelText="Cancelar"
-          >
-            <Button type="link" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Tooltip>
+        <Space size="middle">
+        <Tooltip title="Editar">
+        <Button
+          className="ifes-btn-warning"
+          shape="circle"
+          onClick={() => {
+            setPeriodoToEdit(record);
+            form.setFieldsValue({
+              ano: record.ano,
+              formato: record.formato,
+              periodo: record.periodo,
+              dataInicio: record.dataInicio,
+              dataFim: record.dataFim,
+            });
+            setIsOpenModal(true);
+            setFormato(record.formato); // Definindo o formato ao editar
+          }}
+        >
+          <EditOutlined className="ifes-icon" />
+        </Button>
+      </Tooltip>
+
+          <Tooltip title="Excluir">
+            <Popconfirm
+              title="Tem certeza que deseja excluir este período acadêmico?"
+              onConfirm={() => onDelete(record.id)}
+              okText="Sim"
+              cancelText="Cancelar"
+            >
+              <Button
+                className="ifes-btn-danger"
+                shape="circle"
+                onClick={() => {}}
+              >
+                <DeleteOutlined className="ifes-icon" />
+              </Button>
+            </Popconfirm>
+          </Tooltip>
+        </Space>
       ),
     },
   ];
-
+  
   return (
     <>
       {/* Header */}

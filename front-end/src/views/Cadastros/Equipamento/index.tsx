@@ -48,10 +48,16 @@ const Equipamentos: React.FC = () => {
     form.setFieldValue("descricao", entity ? entity.descricao : "");
   };
 
+
+
   const getEquipamentos = async () => {
     try {
       const response: any[] = await get("equipamentos");
-      setEquipamentos(response);
+      if (Array.isArray(response)) { // Verifica se response é uma array
+        setEquipamentos(response);
+      } else {
+        setEquipamentos([]); // Caso não seja uma array, inicializa como vazia
+      }
     } catch (error) {
       //
     } finally {
@@ -120,6 +126,20 @@ const Equipamentos: React.FC = () => {
       key: "acao",
       render: (acao, record: any) => (
         <Space size="middle">
+          <Tooltip title="Editar">
+            <Button
+              className="ifes-btn-warning"
+              shape="circle"
+              onClick={() => {
+                setEntityToEdit(record);
+                resetFields(record);
+                setIsOpenModal(true);
+              }}
+            >
+              <EditOutlined className="ifes-icon" />
+            </Button>
+          </Tooltip>
+          
           <Tooltip title="Excluir">
             <Popconfirm
               title="Excluir"
@@ -136,20 +156,6 @@ const Equipamentos: React.FC = () => {
                 <DeleteOutlined className="ifes-icon" />
               </Button>
             </Popconfirm>
-          </Tooltip>
-
-          <Tooltip title="Editar">
-            <Button
-              className="ifes-btn-warning"
-              shape="circle"
-              onClick={() => {
-                setEntityToEdit(record);
-                resetFields(record);
-                setIsOpenModal(true);
-              }}
-            >
-              <EditOutlined className="ifes-icon" />
-            </Button>
           </Tooltip>
         </Space>
       ),

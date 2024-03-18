@@ -2,6 +2,7 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.LocalDTO;
 import br.com.sistema.DTO.LocalEquipamentoDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.LocalMapper;
 import br.com.sistema.Model.Equipamento;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -35,11 +37,23 @@ public class LocalService {
         if (localDTO.getEquipamentos() != null) {
             List<LocalEquipamento> localEquipamentos = new ArrayList<>();
 
+            // Lista para armazenar IDs de equipamentos já adicionados
+            List<Long> equipamentoIds = new ArrayList<>();
+
             for (LocalEquipamentoDTO localEquipamentoDTO : localDTO.getEquipamentos()) {
+                Long idEquipamento = localEquipamentoDTO.getEquipamento().getId();
+
+                // Verifica se o equipamento já foi adicionado anteriormente
+                if (equipamentoIds.contains(idEquipamento)) {
+                    throw new BusinessException("Equipamento duplicado encontrado: " + idEquipamento);
+                }
+
+                // Adiciona o ID do equipamento à lista de IDs
+                equipamentoIds.add(idEquipamento);
+
                 LocalEquipamento localEquipamento = new LocalEquipamento();
                 localEquipamento.setLocal(entity);
 
-                Long idEquipamento = localEquipamentoDTO.getEquipamento().getId();
                 Equipamento equipamento = equipamentoRepository.findById(idEquipamento)
                         .orElseThrow(() -> new RuntimeException("Equipamento não encontrado com ID: " + idEquipamento));
 
@@ -76,8 +90,10 @@ public class LocalService {
                         Function.identity()
                 ));
 
-        // Atualiza ou adiciona os LocalEquipamento existentes com base nos dados do DTO
-        for (LocalEquipamento localEquipamento : existingLocal.getLocalEquipamentos()) {
+        // Cria um iterador para percorrer a lista de LocalEquipamento
+        Iterator<LocalEquipamento> iterator = existingLocal.getLocalEquipamentos().iterator();
+        while (iterator.hasNext()) {
+            LocalEquipamento localEquipamento = iterator.next();
             Long equipamentoId = localEquipamento.getEquipamento().getId();
             if (equipamentoDTOMap.containsKey(equipamentoId)) {
                 // Se o equipamento existir no DTO, atualiza a quantidade
@@ -87,7 +103,7 @@ public class LocalService {
                 equipamentoDTOMap.remove(equipamentoId);
             } else {
                 // Se o equipamento não existir no DTO, remove o LocalEquipamento
-                existingLocal.getLocalEquipamentos().remove(localEquipamento);
+                iterator.remove(); // Usando o iterador para remover o item da lista
             }
         }
 
@@ -114,13 +130,15 @@ public class LocalService {
     }
 
 
+    public void delete(Long id) {
+        Local local = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Local com ID '" + id + "' não encontrado."));
 
+        localEquipamentoRepository.deleteByLocal(local);
 
-
-
-    public void delete(Long id){
-        repository.delete(mapper.toEntity(findById(id)));
+        repository.delete(local);
     }
+
 
     //=============================================================================================
 

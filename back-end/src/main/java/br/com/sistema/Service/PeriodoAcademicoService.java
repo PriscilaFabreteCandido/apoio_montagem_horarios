@@ -46,7 +46,10 @@ public class PeriodoAcademicoService {
     }
 
     public void delete(Long id){
-        repository.delete(mapper.toEntity(findById(id)));
+        PeriodoAcademicoDTO periodoAcademicoDTO = findById(id);
+        validate(periodoAcademicoDTO);
+
+        repository.delete(mapper.toEntity(periodoAcademicoDTO));
     }
 
     //=============================================================================================

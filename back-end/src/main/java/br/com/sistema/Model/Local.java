@@ -20,7 +20,7 @@ public class Local {
     @Column
     private Integer capacidade;
 
-    @OneToMany(mappedBy = "local", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "local", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LocalEquipamento> localEquipamentos = new ArrayList<>();
 
 }

@@ -23,11 +23,14 @@ public class LocalController {
 
     @PostMapping("/create")
     public ResponseEntity<LocalDTO> createLocal(@RequestBody LocalDTO localDTO){
+        System.out.println(localDTO);
         return new ResponseEntity<>(localService.create(localDTO), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<LocalDTO> updateLocal(@RequestBody LocalDTO localDTO, @PathVariable Long id){
+        System.out.println(localDTO);
+        System.out.println(id);
         return new ResponseEntity<>(localService.update(localDTO, id), HttpStatus.OK);
     }
 

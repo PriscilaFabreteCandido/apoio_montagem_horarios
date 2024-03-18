@@ -11,12 +11,14 @@ import {
   Select,
   DatePicker,
   TimePicker,
+  Space
 } from "antd";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined, EditOutlined} from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { get, post, put, remove } from "../../api/axios";
 import { ColumnsType } from "antd/es/table";
 import { CardFooter } from "../../components/CardFooter";
+import moment from "moment";
 
 interface DataType {
   key: React.Key;
@@ -84,7 +86,7 @@ const Alocacoes: React.FC = () => {
         setAlocacoes([...alocacoes, response]);
         message.success("Alocação criada com sucesso");
       } else {
-        const response = await put(`alocacoes/update/${entityToEdit.id}`, data);
+        const response = await put(`eventos/update/${entityToEdit.id}`, data);
         setAlocacoes(
           alocacoes.map((alocacao) =>
             alocacao.id === response.id ? response : alocacao
@@ -131,16 +133,45 @@ const Alocacoes: React.FC = () => {
       title: "Ações",
       key: "actions",
       render: (_, record) => (
-        <Tooltip title="Excluir">
-          <Popconfirm
-            title="Tem certeza que deseja excluir esta alocação?"
-            onConfirm={() => onDelete(record.id)}
-            okText="Sim"
-            cancelText="Cancelar"
-          >
-            <Button type="link" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </Tooltip>
+        <span>
+          <Space size="middle">
+          <Tooltip title="Editar">
+            <Button
+              className="ifes-btn-warning"
+              shape="circle"
+                onClick={() => {
+                  setEntityToEdit(record);
+                  form.setFieldsValue({
+                    descricao: record.descricao,
+                    data: moment(record.data),
+                    horaInicio: moment(record.horaInicio, "HH:mm:ss"),
+                    horaFim: moment(record.horaFim, "HH:mm:ss"),
+                  });
+                  setIsOpenModal(true);
+                }}
+              >
+              <EditOutlined className="ifes-icon" />
+            </Button>
+          </Tooltip>
+  
+          <Tooltip title="Excluir">
+            <Popconfirm
+              title="Tem certeza que deseja excluir este evento?"
+              onConfirm={() => onDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                className="ifes-btn-danger"
+                shape="circle"
+                onClick={() => {}}
+              >
+                <DeleteOutlined className="ifes-icon" />
+              </Button>
+            </Popconfirm>
+          </Tooltip>
+          </Space>
+        </span>
       ),
     },
   ];

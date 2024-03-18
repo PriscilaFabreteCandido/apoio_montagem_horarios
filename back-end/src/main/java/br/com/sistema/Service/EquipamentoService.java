@@ -35,9 +35,18 @@ public class EquipamentoService {
         return mapper.toDto(entity);
     }
 
-    public void delete(Long id){
-        repository.delete(mapper.toEntity(findById(id)));
+    public void delete(Long id) {
+        // Verifica se o equipamento com o ID fornecido existe no banco de dados
+        Equipamento equipamento = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Equipamento com ID '" + id + "' não encontrado."));
+
+        if (!equipamento.getLocalEquipamentos().isEmpty()) {
+            throw new RuntimeException("Equipamento está ligado a um local, exclua o local primeiro.");
+        }
+
+        repository.delete(equipamento);
     }
+
 
     //=============================================================================================
 
