@@ -5,6 +5,7 @@ import {
   Table,
   Tooltip,
   Modal,
+  Select,
   Form,
   message,
   Popconfirm,
@@ -23,6 +24,7 @@ interface DataType {
 const Locais: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [entityToEdit, setEntityToEdit] = useState<any>();
+  const [equipamentos, setEquipamentos] = useState<any[]>([]);
   const [locais, setLocais] = useState<any[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>();
@@ -37,6 +39,8 @@ const Locais: React.FC = () => {
     setIsOpenModal(false);
   };
 
+  const { Option } = Select;
+
   const getLocais = async () => {
     try {
       setLoading(true);
@@ -49,8 +53,21 @@ const Locais: React.FC = () => {
     }
   };
 
+  const getEquipamentos = async () => {
+    try {
+      setLoading(true);
+      const response: any[] = await get("equipamentos");
+      setEquipamentos(response);
+    } catch (error) {
+      console.error("Erro ao obter equipamentos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getLocais();
+    getEquipamentos();
   }, []);
 
   const handleOk = async () => {
@@ -60,6 +77,7 @@ const Locais: React.FC = () => {
 
       let data = {
         descricao: values.descricao,
+        capacidade: values.capacidade,
         id: entityToEdit ? entityToEdit.id : null,
       };
 
@@ -94,6 +112,12 @@ const Locais: React.FC = () => {
       title: "Nome",
       dataIndex: "descricao",
       sorter: (a: any, b: any) => a.descricao.localeCompare(b.descricao),
+      sortDirections: ["descend"],
+    },
+    {
+      title: "Capacidade",
+      dataIndex: "capacidade",
+      sorter: (a: any, b: any) => a.capacidade.localeCompare(b.capacidade),
       sortDirections: ["descend"],
     },
     {
@@ -147,6 +171,27 @@ const Locais: React.FC = () => {
             rules={[{ required: true, message: "Por favor, insira o nome!" }]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="capacidade"
+            label="Capacidade"
+            rules={[{ required: true, message: "Por favor, insira a capacidade!" }]}
+          >
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item
+            name="equipamentos"
+            label="Equipamentos"
+            rules={[{ required: true, message: "Por favor, selecione os equipamentos!" }]}
+          >
+            <Select>
+              <Option value="">Selecione um equipamento</Option>
+                {equipamentos.map(equipamento => (
+                  <Option key={equipamento.nome} value={equipamento.id}>
+                    {equipamento.descricao}
+                  </Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
