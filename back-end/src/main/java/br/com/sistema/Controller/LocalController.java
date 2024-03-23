@@ -30,7 +30,6 @@ public class LocalController {
     @PutMapping("/update/{id}")
     public ResponseEntity<LocalDTO> updateLocal(@RequestBody LocalDTO localDTO, @PathVariable Long id){
         System.out.println(localDTO);
-        System.out.println(id);
         return new ResponseEntity<>(localService.update(localDTO, id), HttpStatus.OK);
     }
 

@@ -9,6 +9,7 @@ import {
   message,
   Popconfirm,
   Space,
+  Select
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
@@ -19,12 +20,18 @@ interface CursoType {
   key: React.Key;
   id: number;
   nome: string;
+  coordenadoria: CoordenadoriaType; // Adicione coordenadoria ao CursoType
+}
+interface CoordenadoriaType {
+  id: number;
+  descricao: string;
 }
 
 const Cursos: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [cursoToEdit, setCursoToEdit] = useState<CursoType | null>(null);
   const [cursos, setCursos] = useState<CursoType[]>([]);
+  const [coordenadorias, setCoordenadorias] = useState<CoordenadoriaType[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -54,13 +61,28 @@ const Cursos: React.FC = () => {
     getCursos();
   }, []);
 
+  const getCoordenadorias = async () => {
+    try {
+      const response: CoordenadoriaType[] = await get("coordenadorias");
+      setCoordenadorias(response);
+    } catch (error) {
+      console.error("Erro ao obter coordenadorias:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCoordenadorias();
+  }, []);
+
   const handleOk = async () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
 
+      const coordenadoriaSelecionada = coordenadorias.find(coordenadoria => coordenadoria.id === values.coordenadoria);
       const cursoData = {
         nome: values.nome,
+        coordenadoria: coordenadoriaSelecionada,
         id: cursoToEdit ? cursoToEdit.id : null,
       };
 
@@ -115,6 +137,7 @@ const Cursos: React.FC = () => {
                 setCursoToEdit(record);
                 form.setFieldsValue({
                   nome: record.nome,
+                  coordenadoria: record.coordenadoria.id, // Definir a coordenadoria selecionada na combobox
                 });
                 setIsOpenModal(true);
               }}
@@ -179,7 +202,28 @@ const Cursos: React.FC = () => {
           >
             <Input />
           </Form.Item>
-         
+          <Form.Item
+            name="coordenadoria"
+            label="Coordenadoria"
+            rules={[
+              { required: true, message: "Por favor, selecione a coordenadoria!" },
+            ]}
+          >
+            <Select>
+              {coordenadorias.length > 0 ? (
+                coordenadorias.map((coordenadoria) => (
+                  <Select.Option key={coordenadoria.id} value={coordenadoria.id}>
+                    {coordenadoria.descricao}
+                  </Select.Option>
+                ))
+              ) : (
+                <Select.Option value={null} disabled>
+                  Nenhuma coordenadoria disponível
+                </Select.Option>
+              )}
+            </Select>
+          </Form.Item>
+
         </Form>
       </Modal>
     </>

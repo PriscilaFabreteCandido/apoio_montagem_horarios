@@ -26,6 +26,7 @@ public class EquipamentoController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<EquipamentoDTO> updateEquipment(@RequestBody EquipamentoDTO equipamentoDTO, @PathVariable Long id){
+        System.out.println(equipamentoDTO);
         return new ResponseEntity<>(equipamentoService.update(equipamentoDTO, id), HttpStatus.OK);
     }
 

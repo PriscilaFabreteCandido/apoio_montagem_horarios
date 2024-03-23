@@ -12,19 +12,27 @@ import {
   Space,
   Row,
   Col,
+  Switch
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
+import { Select } from "antd";
+const { Option } = Select;
 
 interface ProfessorType {
   key: React.Key;
   id: number;
   matricula: string;
   nome: string;
-  professor: boolean;
+  coordenador: boolean;
+  coordenadoria: CoordenadoriaType;
+}
+interface CoordenadoriaType {
+  id: number;
+  descricao: string;
 }
 
 const Professores: React.FC = () => {
@@ -33,6 +41,7 @@ const Professores: React.FC = () => {
     null
   );
   const [professores, setProfessores] = useState<ProfessorType[]>([]);
+  const [coordenadorias, setCoordenadorias] = useState<CoordenadoriaType[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -45,6 +54,19 @@ const Professores: React.FC = () => {
     setProfessorToEdit(null);
     setIsOpenModal(false);
   };
+
+  const getCoordenadorias = async () => {
+    try {
+      const response: CoordenadoriaType[] = await get("coordenadorias"); // Fazer a requisição para obter as coordenadorias
+      setCoordenadorias(response); // Atualizar o estado das coordenadorias
+    } catch (error) {
+      console.error("Erro ao obter coordenadorias:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCoordenadorias(); // Chamar a função para obter as coordenadorias ao carregar a página
+  }, []);
 
   const getProfessores = async () => {
     setLoading(true);
@@ -66,14 +88,19 @@ const Professores: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
+      // Convertendo o valor do campo coordenador para booleano
+      const isCoordenador = values.coordenador === true;
+  
+      const coordenadoriaSelecionada = coordenadorias.find(coordenadoria => coordenadoria.id === values.coordenadoria);
       const professorData = {
         matricula: values.matricula,
         nome: values.nome,
-        professor: values.professor,
+        coordenador: isCoordenador, // Usando o valor convertido para booleano
+        coordenadoria: coordenadoriaSelecionada,
         id: professorToEdit ? professorToEdit.id : null,
       };
-
+  
       if (!professorToEdit) {
         const response = await post("professores/create", professorData);
         setProfessores([...professores, response]);
@@ -90,12 +117,13 @@ const Professores: React.FC = () => {
         );
         message.success("Professor editado com sucesso");
       }
-
+  
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
 
   const onDelete = async (id: number) => {
     try {
@@ -107,19 +135,21 @@ const Professores: React.FC = () => {
     }
   };
 
+
+  
   const columns: ColumnsType<ProfessorType> = [
-    {
-      title: "Matrícula",
-      dataIndex: "matricula",
-    },
     {
       title: "Nome",
       dataIndex: "nome",
+      render: (text, record) => (
+        <span style={{ fontSize: 'inherit' }}>
+          {text} {record.coordenador && <span style={{ color: 'green' }}> (Coordenador)</span>}
+        </span>
+      ),
     },
     {
-      title: "Coordenador",
-      dataIndex: "professor",
-      render: (professor) => (professor ? "Sim" : "Não"),
+      title: "Matrícula",
+      dataIndex: "matricula",
     },
     {
       title: "Ações",
@@ -133,9 +163,10 @@ const Professores: React.FC = () => {
               onClick={() => {
                 setProfessorToEdit(record);
                 form.setFieldsValue({
-                  matricula: record.matricula,
                   nome: record.nome,
-                  professor: record.professor,
+                  matricula: record.matricula,
+                  coordenador: record.coordenador,
+                  coordenadoria: record.coordenadoria.id,
                 });
                 setIsOpenModal(true);
               }}
@@ -163,7 +194,8 @@ const Professores: React.FC = () => {
       ),
     },
   ];
-
+  
+ 
   return (
     <>
       {/* Header */}
@@ -192,15 +224,6 @@ const Professores: React.FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="matricula"
-            label="Matrícula"
-            rules={[
-              { required: true, message: "Por favor, insira a matrícula!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
             name="nome"
             label="Nome"
             rules={[
@@ -212,16 +235,51 @@ const Professores: React.FC = () => {
           >
             <Input />
           </Form.Item>
+          <Form.Item
+            name="matricula"
+            label="Matrícula"
+            rules={[
+              { required: true, message: "Por favor, insira a matrícula!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
+          {/* Combobox para as coordenadorias */}
+          <Form.Item
+            name="coordenadoria"
+            label="Coordenadoria"
+            rules={[
+              { required: true, message: "Por favor, selecione a coordenadoria!" },
+            ]}
+          >
+            <Select>
+              {coordenadorias.length > 0 ? (
+                coordenadorias.map((coordenadoria) => (
+                  <Select.Option key={coordenadoria.id} value={coordenadoria.id}>
+                    {coordenadoria.descricao}
+                  </Select.Option>
+                ))
+              ) : (
+                <Select.Option value={null} disabled>
+                  Nenhuma coordenadoria disponível
+                </Select.Option>
+              )}
+            </Select>
+          </Form.Item>
+
+
+          {/* Checkbox para o coordenador */}
           <Form.Item
             label="Coordenador"
             name="coordenador"
             style={{ marginBottom: 0 }}
-            labelCol={{ span: 8 }} // Define a largura da coluna do rótulo
-            wrapperCol={{ span: 20 }} // Define a largura da coluna do conteúdo
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 20 }}
           >
-            <Checkbox />
+            <Switch />
           </Form.Item>
+
         </Form>
       </Modal>
     </>

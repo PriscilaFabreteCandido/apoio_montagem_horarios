@@ -9,6 +9,7 @@ import {
   message,
   Popconfirm,
   Space,
+  Select
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
@@ -20,14 +21,24 @@ interface AlunoType {
   id: number;
   nome: string;
   matricula: string;
+  curso: CursoType;
 }
+
+interface CursoType {
+  id: number;
+  nome: string;
+}
+
 
 const Alunos: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [alunoToEdit, setAlunoToEdit] = useState<AlunoType | null>(null);
+  const [cursos, setCursos] = useState<CursoType[]>([]);
   const [alunos, setAlunos] = useState<AlunoType[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
+  const [cursoSelecionado, setCursoSelecionado] = useState<CursoType | null>(null);
+
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -39,6 +50,16 @@ const Alunos: React.FC = () => {
     setIsOpenModal(false);
   };
 
+  const getCursos = async () => {
+    try {
+      const response: CursoType[] = await get("cursos");
+      setCursos(response);
+    } catch (error) {
+      console.error("Erro ao obter cursos:", error);
+    }
+  };
+
+  
   const getAlunos = async () => {
     setLoading(true);
     try {
@@ -53,19 +74,22 @@ const Alunos: React.FC = () => {
 
   useEffect(() => {
     getAlunos();
+    getCursos();
   }, []);
+  
 
   const handleOk = async () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
       const alunoData = {
         nome: values.nome,
         matricula: values.matricula,
+        curso: cursoSelecionado, // Alterado para pegar o objeto do curso selecionado
         id: alunoToEdit ? alunoToEdit.id : null,
       };
-
+  
       if (!alunoToEdit) {
         const response = await post("alunos/create", alunoData);
         setAlunos([...alunos, response]);
@@ -82,12 +106,14 @@ const Alunos: React.FC = () => {
         );
         message.success("Aluno editado com sucesso");
       }
-
+  
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
+  
 
   const onDelete = async (id: number) => {
     try {
@@ -108,6 +134,11 @@ const Alunos: React.FC = () => {
       title: "Matrícula",
       dataIndex: "matricula",
     },
+    {
+      title: "Curso",
+      dataIndex: "curso",
+      render: (curso: CursoType | null) => curso ? curso.nome : 'N/A',
+    },    
     {
       title: "Ações",
       key: "actions",
@@ -149,7 +180,7 @@ const Alunos: React.FC = () => {
       ),
     },
   ];
-
+  
   return (
     <>
       {/* Header */}
@@ -195,6 +226,30 @@ const Alunos: React.FC = () => {
           >
             <Input />
           </Form.Item>
+          <Form.Item
+            name="curso"
+            label="Curso"
+            rules={[
+              { required: true, message: "Por favor, selecione o curso do aluno!" },
+            ]}
+          >
+            <Select
+              onChange={(cursoId) => {
+                const curso = cursos.find(curso => curso.id === cursoId);
+                if (curso) {
+                  setCursoSelecionado(curso);
+                }
+              }}
+            >
+              {cursos.map(curso => (
+                <Select.Option key={curso.id} value={curso.id}>
+                  {curso.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+
         </Form>
       </Modal>
     </>

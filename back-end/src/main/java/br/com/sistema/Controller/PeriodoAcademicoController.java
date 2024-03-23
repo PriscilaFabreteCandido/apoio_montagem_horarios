@@ -28,6 +28,7 @@ public class PeriodoAcademicoController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<PeriodoAcademicoDTO> updatePeriod(@RequestBody PeriodoAcademicoDTO periodoAcademicoDTO, @PathVariable Long id) {
+        System.out.println(periodoAcademicoDTO);
         return new ResponseEntity<>(periodoAcademicoService.update(periodoAcademicoDTO, id), HttpStatus.OK);
     }
 
