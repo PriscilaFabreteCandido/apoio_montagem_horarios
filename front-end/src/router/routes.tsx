@@ -11,6 +11,10 @@ import Equipamentos from "../views/Cadastros/Equipamento";
 import SemestresLetivos from "../views/Cadastros/SemestreLetivo";
 import Locais from "../views/Cadastros/local";
 import Alocacoes from "../views/Alocacoes";
+import Professores from "../views/Cadastros/Professor";
+import Coordenadorias from "../views/Cadastros/Coordenadoria";
+import Cursos from "../views/Cadastros/Curso";
+import Alunos from "../views/Cadastros/Aluno";
 
 export interface RouteConfig {
   path: string;
@@ -43,26 +47,33 @@ const routes: RouteConfig[] = [
 
       //Relatórios
       { path: "Relatórios", element: <Relatorios />, permissions: "" },
-
       //Semestre Letivo
       { path: "Cadastros/Semestres Letivos", element: <SemestresLetivos />, permissions: "" },
-      
       //Locais
       { path: "Cadastros/Locais", element: <Locais />, permissions: "" },
+      //Professores
+      { path: "Cadastros/Coordenadorias", element: <Coordenadorias />, permissions: "" },
+      //Professores
+      { path: "Cadastros/Professores", element: <Professores />, permissions: "" },
+      //Cursos
+      { path: "Cadastros/Cursos", element: <Cursos />, permissions: "" },
+      //Alunos
+      { path: "Cadastros/Alunos", element: <Alunos />, permissions: "" },
+
 
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
-      {
-        path: "*",
-        permissions: "",
-        element: (
-          <>
-            {" "}
-            <Navigate to="/404" replace />
-            <Error404 />
-          </>
-        ),
-      },
+      // {
+      //   path: "*",
+      //   permissions: "",
+      //   element: (
+      //     <>
+      //       {" "}
+      //       <Navigate to="/404" replace />
+      //       <Error404 />
+      //     </>
+      //   ),
+      // },
     ],
   },
 ];
