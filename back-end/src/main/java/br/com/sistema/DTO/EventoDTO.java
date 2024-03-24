@@ -14,10 +14,10 @@ public class EventoDTO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT-3")
     private Date data;
 
-    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT-3")
+    @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
     private Date horaInicio;
 
-    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT-3")
+    @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
     private Date horaFim;
 
 

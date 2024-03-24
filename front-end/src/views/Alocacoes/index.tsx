@@ -56,6 +56,12 @@ const Alocacoes: React.FC = () => {
     try {
       setLoading(true);
       const response: any[] = await get("eventos");
+      // Ordenar os dados por data e hora
+      response.sort((a, b) => {
+        const dataA: moment.Moment = moment(a.data + ' ' + a.horaInicio, 'YYYY-MM-DD HH:mm');
+        const dataB: moment.Moment = moment(b.data + ' ' + b.horaInicio, 'YYYY-MM-DD HH:mm');
+        return dataA.diff(dataB);
+      });
       setAlocacoes(response);
     } catch (error) {
       console.error("Erro ao obter alocações:", error);
@@ -63,6 +69,7 @@ const Alocacoes: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     getAlocacoes();
@@ -72,34 +79,40 @@ const Alocacoes: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
+      console.log(values)
+  
       let data = {
         descricao: values.descricao,
-        data: values.data.format("YYYY-MM-DD"),
-        horaInicio: values.horaInicio.format("HH:mm:ss"),
-        horaFim: values.horaFim.format("HH:mm:ss"),
-        id: entityToEdit ? entityToEdit.id : null,
+        data: values.data,
+        horaInicio: values.horaInicio,
+        horaFim: values.horaFim,
+        id: entityToEdit ? entityToEdit.id : null
       };
-
+  
+      let response;
       if (!entityToEdit) {
-        const response = await post("eventos/create", data);
-        setAlocacoes([...alocacoes, response]);
+        response = await post("eventos/create", data);
         message.success("Alocação criada com sucesso");
       } else {
-        const response = await put(`eventos/update/${entityToEdit.id}`, data);
-        setAlocacoes(
-          alocacoes.map((alocacao) =>
-            alocacao.id === response.id ? response : alocacao
-          )
-        );
+        response = await put(`eventos/update/${entityToEdit.id}`, data);
         message.success("Alocação editada com sucesso");
       }
-
+  
+      // Adicionando ou editando, ordenando novamente os dados
+      const updatedAlocacoes = [...alocacoes, response].sort((a, b) => {
+        const dataA: moment.Moment = moment(a.data + ' ' + a.horaInicio, 'YYYY-MM-DD HH:mm');
+        const dataB: moment.Moment = moment(b.data + ' ' + b.horaInicio, 'YYYY-MM-DD HH:mm');
+        return dataA.diff(dataB);
+      });
+  
+      setAlocacoes(updatedAlocacoes);
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
 
   const onDelete = async (id: number) => {
     try {
@@ -120,14 +133,20 @@ const Alocacoes: React.FC = () => {
     {
       title: "Dia",
       dataIndex: "data",
+      render: (data: string) => moment(data).format("DD/MM/YYYY"),
+      sorter: (a: any, b: any) => moment(a.data).diff(moment(b.data)),
     },
     {
       title: "Início",
       dataIndex: "horaInicio",
+      render: (horaInicio: string) => moment(horaInicio, "HH:mm:ss").format("HH:mm"),
+      sorter: (a: any, b: any) => moment(a.horaInicio, "HH:mm:ss").diff(moment(b.horaInicio, "HH:mm:ss")),
     },
     {
       title: "Término",
       dataIndex: "horaFim",
+      render: (horaFim: string) => moment(horaFim, "HH:mm:ss").format("HH:mm"),
+      sorter: (a: any, b: any) => moment(a.horaFim, "HH:mm:ss").diff(moment(b.horaFim, "HH:mm:ss")),
     },
     {
       title: "Ações",
@@ -136,24 +155,23 @@ const Alocacoes: React.FC = () => {
         <span>
           <Space size="middle">
           <Tooltip title="Editar">
-            <Button
-              className="ifes-btn-warning"
-              shape="circle"
-                onClick={() => {
-                  setEntityToEdit(record);
-                  form.setFieldsValue({
-                    descricao: record.descricao,
-                    data: moment(record.data),
-                    horaInicio: moment(record.horaInicio, "HH:mm:ss"),
-                    horaFim: moment(record.horaFim, "HH:mm:ss"),
-                  });
-                  setIsOpenModal(true);
-                }}
-              >
-              <EditOutlined className="ifes-icon" />
-            </Button>
-          </Tooltip>
-  
+          <Button
+            className="ifes-btn-warning"
+            shape="circle"
+            onClick={() => {
+              setEntityToEdit(record);
+              form.setFieldsValue({
+                descricao: record.descricao,
+                data: moment(record.data).format("YYYY-MM-DD"), // Mantenha no formato de string
+                horaInicio: moment(record.horaInicio, "HH:mm").format("HH:mm"), // Formate corretamente a hora de início
+                horaFim: moment(record.horaFim, "HH:mm").format("HH:mm") // Formate corretamente a hora de término
+              });
+              setIsOpenModal(true);
+            }}
+          >
+            <EditOutlined className="ifes-icon" />
+          </Button>
+        </Tooltip>
           <Tooltip title="Excluir">
             <Popconfirm
               title="Tem certeza que deseja excluir este evento?"
@@ -219,7 +237,8 @@ const Alocacoes: React.FC = () => {
             label="Dia"
             rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
-            <DatePicker format="YYYY-MM-DD" />
+          
+          <Input type="date" />
           </Form.Item>
           <Form.Item
             name="horaInicio"
@@ -231,7 +250,7 @@ const Alocacoes: React.FC = () => {
               },
             ]}
           >
-            <TimePicker format="HH:mm:ss" />
+            <Input type="time" />
           </Form.Item>
           <Form.Item
             name="horaFim"
@@ -243,7 +262,7 @@ const Alocacoes: React.FC = () => {
               },
             ]}
           >
-            <TimePicker format="HH:mm:ss" />
+            <Input type="time" />
           </Form.Item>
         </Form>
       </Modal>
