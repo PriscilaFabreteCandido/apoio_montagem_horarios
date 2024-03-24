@@ -16,6 +16,7 @@ import { useNavigate } from "react-router";
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
+import moment from "moment";
 
 
 interface PeriodoAcademicoType {
@@ -121,10 +122,12 @@ const PeriodosAcademicos: React.FC = () => {
     {
       title: "Data de Início",
       dataIndex: "dataInicio",
+      render: (dataInicio) => moment(dataInicio).format("DD/MM/YYYY")
     },
     {
       title: "Data de Fim",
       dataIndex: "dataFim",
+      render: (dataFim) => moment(dataFim).format("DD/MM/YYYY")
     },
     {
       title: "Formato",

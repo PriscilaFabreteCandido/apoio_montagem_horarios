@@ -153,6 +153,7 @@ const Alunos: React.FC = () => {
                 form.setFieldsValue({
                   nome: record.nome,
                   matricula: record.matricula,
+                  curso: record.curso.id
                 });
                 setIsOpenModal(true);
               }}
