@@ -80,17 +80,19 @@ const Locais: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
       const data = {
         descricao: values.descricao,
         capacidade: values.capacidade,
-        equipamentos: values.equipamentos.map((equip: any) => ({
-          equipamento: { id: equip.id },
-          quantidade: equip.quantidade,
-        })),
+        equipamentos: values.equipamentos
+          ? values.equipamentos.map((equip: any) => ({
+              equipamento: { id: equip.id },
+              quantidade: equip.quantidade,
+            }))
+          : [], // Fornecer um array vazio se values.equipamentos for undefined
         id: entityToEdit ? entityToEdit.id : null,
       };
-
+  
       if (!entityToEdit) {
         const response = await post("locais/create", data);
         setLocais([...locais, response]);
@@ -102,12 +104,13 @@ const Locais: React.FC = () => {
         );
         message.success("Local editado com sucesso");
       }
-
+  
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
 
   const onDelete = async (id: number) => {
     try {
