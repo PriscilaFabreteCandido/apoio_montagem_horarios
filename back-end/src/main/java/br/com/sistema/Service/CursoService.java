@@ -31,7 +31,7 @@ public class CursoService {
         Coordenadoria coordenadoria = entity.getCoordenadoria();
 
         if(coordenadoria != null){
-            coordenadoria.setCurso(entity);
+            coordenadoria.getCursos().add(entity);
             coordenadoriaRepository.save(coordenadoria);
         }
 
@@ -48,12 +48,9 @@ public class CursoService {
         Coordenadoria coordenadoria = entity.getCoordenadoria();
 
         if(coordenadoria != null){
-            coordenadoria.setCurso(entity);
+            coordenadoria.getCursos().add(entity);
             coordenadoriaRepository.save(coordenadoria);
         }
-
-        coordenadoria.setCurso(entity);
-        coordenadoriaRepository.save(coordenadoria);
 
         return mapper.toDto(entity);
     }

@@ -17,7 +17,8 @@ public class Curso {
     @Column
     private String nome;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "coordenadoria_id")
     private Coordenadoria coordenadoria;
 
     @OneToMany(mappedBy = "curso")

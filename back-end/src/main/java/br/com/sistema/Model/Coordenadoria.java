@@ -20,7 +20,6 @@ public class Coordenadoria {
     @OneToMany(mappedBy = "coordenadoria", cascade = CascadeType.ALL)
     private List<Professor> professores = new ArrayList<>();
 
-    @OneToOne
-    private Curso curso;
-
+    @OneToMany(mappedBy = "coordenadoria")
+    private List<Curso> cursos = new ArrayList<>();
 }
