@@ -131,7 +131,7 @@ const Alocacoes: React.FC = () => {
       sorter: (a: any, b: any) => a.descricao.localeCompare(b.descricao),
     },
     {
-      title: "Dia",
+      title: "Data",
       dataIndex: "data",
       render: (data: string) => moment(data).format("DD/MM/YYYY"),
       sorter: (a: any, b: any) => moment(a.data).diff(moment(b.data)),

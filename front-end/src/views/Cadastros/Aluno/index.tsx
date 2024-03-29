@@ -234,20 +234,22 @@ const Alunos: React.FC = () => {
               { required: true, message: "Por favor, selecione o curso do aluno!" },
             ]}
           >
-            <Select
-              onChange={(cursoId) => {
-                const curso = cursos.find(curso => curso.id === cursoId);
-                if (curso) {
-                  setCursoSelecionado(curso);
-                }
-              }}
-            >
-              {cursos.map(curso => (
+          <Select
+            onChange={(cursoId) => {
+              const curso = cursos.find(curso => curso.id === cursoId);
+              if (curso) {
+                setCursoSelecionado(curso);
+              }
+            }}
+          >
+            {cursos.length > 0 &&
+              cursos.map(curso => (
                 <Select.Option key={curso.id} value={curso.id}>
                   {curso.nome}
                 </Select.Option>
-              ))}
-            </Select>
+              ))
+            }
+          </Select>
           </Form.Item>
 
 

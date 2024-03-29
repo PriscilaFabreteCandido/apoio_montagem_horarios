@@ -59,12 +59,14 @@ const Disciplinas: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
+      console.log("Objeto enviado para criação:", values); // Adicionando console.log para verificar o objeto enviado
+  
       const disciplinaData = {
         nome: values.nome,
         id: disciplinaToEdit ? disciplinaToEdit.id : null,
       };
-
+  
       if (!disciplinaToEdit) {
         const response = await post("disciplinas/create", disciplinaData);
         setDisciplinas([...disciplinas, response]);
@@ -81,12 +83,13 @@ const Disciplinas: React.FC = () => {
         );
         message.success("Disciplina editada com sucesso");
       }
-
+  
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
 
   const onDelete = async (id: number) => {
     try {

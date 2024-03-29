@@ -79,7 +79,7 @@ const Aulas: React.FC = () => {
         setAulas([...aulas, response]);
         message.success("Aula criada com sucesso");
       } else {
-        const response = await put(`cursos/update/${aulaToEdit.id}`, aulaData);
+        const response = await put(`aulas/update/${aulaToEdit.id}`, aulaData);
         setAulas(aulas.map((a) => (a.id === response.id ? response : a)));
         message.success("Aula editada com sucesso");
       }
@@ -104,17 +104,20 @@ const Aulas: React.FC = () => {
     {
       title: "Data",
       dataIndex: "data",
-      render: (data) => moment(data).format("DD/MM/YYYY"),
+      render: (data: string) => moment(data).format("DD/MM/YYYY"),
+      sorter: (a: any, b: any) => moment(a.data).diff(moment(b.data)),
     },
     {
-      title: "Hora Início",
+      title: "Início",
       dataIndex: "horaInicio",
-      // render: (horaInicio) => moment(horaInicio).format("HH:mm"),
+      render: (horaInicio: string) => moment(horaInicio, "HH:mm:ss").format("HH:mm"),
+      sorter: (a: any, b: any) => moment(a.horaInicio, "HH:mm:ss").diff(moment(b.horaInicio, "HH:mm:ss")),
     },
     {
-      title: "Hora Fim",
+      title: "Término",
       dataIndex: "horaFim",
-      // render: (horaInicio) => moment(horaInicio).format("HH:mm"),
+      render: (horaFim: string) => moment(horaFim, "HH:mm:ss").format("HH:mm"),
+      sorter: (a: any, b: any) => moment(a.horaFim, "HH:mm:ss").diff(moment(b.horaFim, "HH:mm:ss")),
     },
     {
       title: "Ações",
@@ -202,59 +205,37 @@ const Aulas: React.FC = () => {
         onCancel={handleCancel}
       >
         <Form form={form} layout="vertical" style={{ flex: 1 }}>
-          <Form.Item
+        <Form.Item
             name="data"
-            label="Data"
-            style={{ width: "100%" }}
-            rules={[
-              { required: true, message: "Por favor, insira a data da aula!" },
-            ]}
+            label="Dia"
+            rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
-            <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+          
+          <Input type="date" />
           </Form.Item>
           <Form.Item
             name="horaInicio"
-            label="Hora Inicio"
+            label="Início"
             rules={[
               {
                 required: true,
-                message: "Por favor, insira a hora de fim da aula!",
+                message: "Por favor, insira o horário de início!",
               },
             ]}
           >
-            <Input
-              placeholder="HH:mm"
-              onChange={(e) => {
-                const { value } = e.target;
-                const formattedValue = formatTime(value);
-                // Define o valor formatado no campo de entrada
-                e.target.value = formattedValue;
-                form.setFieldValue('horaInicio', formattedValue)
-              }}
-            />
+            <Input type="time" />
           </Form.Item>
           <Form.Item
             name="horaFim"
-            label="Hora Fim"
+            label="Término"
             rules={[
               {
                 required: true,
-                message: "Por favor, insira a hora de fim da aula!",
+                message: "Por favor, insira o horário de término!",
               },
             ]}
           >
-            <Input
-              placeholder="HH:mm"
-              onChange={(e) => {
-                const { value } = e.target;
-                let formattedValue = formatTime(value);
-                
-                // Se o valor formatado for diferente do valor original, atualize o valor no campo
-                if (formattedValue !== value) {
-                  form.setFieldValue('horaFim', formattedValue);
-                }
-              }}
-            />
+            <Input type="time" />
           </Form.Item>
         </Form>
       </Modal>
