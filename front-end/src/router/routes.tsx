@@ -1,7 +1,7 @@
 import { Navigate } from "react-router";
 import Home from "../views/app/home";
 import RootLayout from "../layout";
-import Login from "../views/app/Login";
+
 import Logout from "../views/app/Logout";
 
 import Consultas from "../views/Consultas";
@@ -15,6 +15,8 @@ import Professores from "../views/Cadastros/Professor";
 import Coordenadorias from "../views/Cadastros/Coordenadoria";
 import Cursos from "../views/Cadastros/Curso";
 import Alunos from "../views/Cadastros/Aluno";
+import Aulas from "../views/Cadastros/Aula";
+import Disciplinas from "../views/Cadastros/Disciplina";
 
 export interface RouteConfig {
   path: string;
@@ -24,7 +26,7 @@ export interface RouteConfig {
 }
 
 const routes: RouteConfig[] = [
-  { path: "/login", element: <Login />, permissions: "" },
+  // { path: "/login", element: <Login />, permissions: "" },
   { path: "/logout", element: <Logout />, permissions: "" },
   {
     path: "",
@@ -59,8 +61,12 @@ const routes: RouteConfig[] = [
       { path: "Cadastros/Cursos", element: <Cursos />, permissions: "" },
       //Alunos
       { path: "Cadastros/Alunos", element: <Alunos />, permissions: "" },
-
-
+      
+      //Aulas
+      { path: "Cadastros/Aulas", element: <Aulas />, permissions: "" },
+      //Aulas
+      { path: "Cadastros/Disciplinas", element: <Disciplinas />, permissions: "" },
+      
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       // {
