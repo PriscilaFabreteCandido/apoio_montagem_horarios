@@ -11,6 +11,8 @@ public interface PeriodoAcademicoMapper extends EntityMapper<PeriodoAcademicoDTO
 
     @AfterMapping
     default void afterMapping(PeriodoAcademico periodoAcademico, @MappingTarget PeriodoAcademicoDTO periodoAcademicoDTO) {
-        periodoAcademicoDTO.setPeriodo(periodoAcademico.getPeriodo().getDescricao());
+        if (periodoAcademico.getPeriodo().getDescricao() != null) {
+            periodoAcademicoDTO.setPeriodo(periodoAcademico.getPeriodo().getDescricao());
+        }
     }
 }

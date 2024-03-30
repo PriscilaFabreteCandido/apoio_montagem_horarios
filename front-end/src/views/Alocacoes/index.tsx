@@ -234,7 +234,7 @@ const Alocacoes: React.FC = () => {
           </Form.Item>
           <Form.Item
             name="data"
-            label="Dia"
+            label="Data"
             rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
           

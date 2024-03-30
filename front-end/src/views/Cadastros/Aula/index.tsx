@@ -11,6 +11,7 @@ import {
   Popconfirm,
   Space,
   TimePicker,
+  Select
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
@@ -18,18 +19,38 @@ import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
 import moment from "moment";
 
+const { Option } = Select;
+
 interface AulaType {
   key: React.Key;
   id: number;
-  data: string; // Data apenas (sem hora)
-  horaInicio: string; // Hora de início (sem data)
-  horaFim: string; // Hora de fim (sem data)
+  data: string;
+  horaInicio: string;
+  horaFim: string;
+  local: {
+    id: number;
+    descricao: string;
+  };
+  professor: {
+    id: number;
+    nome: string;
+  };
+  periodoAcademico: {
+    id: number;
+    ano: number;
+    periodo: number;
+    formato: string;
+  };
 }
+
 
 const Aulas: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [aulaToEdit, setAulaToEdit] = useState<AulaType | null>(null);
   const [aulas, setAulas] = useState<any[]>([]);
+  const [locais, setLocais] = useState<any[]>([]); // Estado para armazenar os locais
+  const [professores, setProfessores] = useState<any[]>([]); // Estado para armazenar os professores
+  const [periodosAcademicos, setPeriodosAcademicos] = useState<any[]>([]); // Estado para armazenar os períodos acadêmicos
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -46,8 +67,6 @@ const Aulas: React.FC = () => {
   const getAulas = async () => {
     setLoading(true);
     try {
-      // Simulando obtenção de dados de aulas
-      // Suponha que você tenha um endpoint para obter dados de aulas
       const response = await get("aulas");
       setAulas(response);
     } catch (error) {
@@ -57,8 +76,38 @@ const Aulas: React.FC = () => {
     }
   };
 
+  const getLocais = async () => {
+    try {
+      const response = await get("locais");
+      setLocais(response);
+    } catch (error) {
+      console.error("Erro ao obter locais:", error);
+    }
+  };
+
+  const getProfessores = async () => {
+    try {
+      const response = await get("professores");
+      setProfessores(response);
+    } catch (error) {
+      console.error("Erro ao obter professores:", error);
+    }
+  };
+
+  const getPeriodosAcademicos = async () => {
+    try {
+      const response = await get("periodos");
+      setPeriodosAcademicos(response);
+    } catch (error) {
+      console.error("Erro ao obter períodos acadêmicos:", error);
+    }
+  };
+
   useEffect(() => {
     getAulas();
+    getLocais();
+    getProfessores();
+    getPeriodosAcademicos();
   }, []);
 
   const handleOk = async () => {
@@ -68,13 +117,18 @@ const Aulas: React.FC = () => {
 
       const aulaData = {
         data: moment(values.data).format("YYYY-MM-DD"),
-        horaInicio: values.horaInicio,
-        horaFim: values.horaFim,
+        horaInicio: moment(values.horaInicio, "HH:mm").format("HH:mm:ss"),
+        horaFim: moment(values.horaFim, "HH:mm").format("HH:mm:ss"),
+        local: locais.find(local => local.id === values.localId),
+        professor: professores.find(professor => professor.id === values.professorId),
+        periodoAcademico: periodosAcademicos.find(periodo => periodo.id === values.periodoAcademicoId),
         id: aulaToEdit ? aulaToEdit.id : null,
       };
+      
+      
+      
 
       if (!aulaToEdit) {
-        // Simulando a criação de uma aula
         const response = await post("aulas/create", aulaData);
         setAulas([...aulas, response]);
         message.success("Aula criada com sucesso");
@@ -92,7 +146,7 @@ const Aulas: React.FC = () => {
 
   const onDelete = async (id: number) => {
     try {
-      // Simulando a exclusão de uma aula
+      await remove(`aulas/delete/${id}`);
       setAulas(aulas.filter((aula) => aula.id !== id));
       message.success("Aula excluída com sucesso");
     } catch (error) {
@@ -120,41 +174,68 @@ const Aulas: React.FC = () => {
       sorter: (a: any, b: any) => moment(a.horaFim, "HH:mm:ss").diff(moment(b.horaFim, "HH:mm:ss")),
     },
     {
+      title: "Local",
+      dataIndex: "local",
+      key: "local",
+      render: (local: { id: number; descricao: string }) => {
+        return local ? local.descricao : "";
+      },
+    },
+    {
+      title: "Professor",
+      dataIndex: "professor",
+      key: "professor",
+      render: (professor: { id: number; nome: string }) => {
+        return professor ? professor.nome : "";
+      },
+    },
+    {
+      title: "Período Acadêmico",
+      dataIndex: "periodoAcademico",
+      key: "periodoAcademico",
+      render: (periodoAcademico: { ano: number; periodo: number; formato: string}) => {
+        return periodoAcademico ? 
+          periodoAcademico.formato === "ANUAL" ? 
+            periodoAcademico.ano : 
+            `${periodoAcademico.ano}/${periodoAcademico.periodo}` : 
+          "";
+      },
+    },
+    
+    
+    {
       title: "Ações",
-      key: "actions",
+      key: "action",
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Editar">
-            <Button
-              className="ifes-btn-warning"
-              shape="circle"
-              onClick={() => {
-                setAulaToEdit(record);
-                form.setFieldsValue({
-                  data: moment(record.data),
-                  horaInicio: record.horaInicio,
-                  horaFim: record.horaFim,
-                });
-                setIsOpenModal(true);
-              }}
-            >
-              <EditOutlined className="ifes-icon" />
-            </Button>
-          </Tooltip>
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<EditOutlined />}
+          onClick={() => {
+            setAulaToEdit(record);
+            form.setFieldsValue({
+              data: moment(record.data).format("YYYY-MM-DD"),
+              horaInicio: moment(record.horaInicio, "HH:mm").format("HH:mm"),
+              horaFim: moment(record.horaFim, "HH:mm").format("HH:mm"),
+              localId: record.local.id,
+              professorId: record.professor.id,
+              periodoAcademicoId: record.periodoAcademico.id,
+            });
+            showModal();
+          }}
+        />
+      </Tooltip>
+
           <Tooltip title="Excluir">
             <Popconfirm
-              title="Tem certeza que deseja excluir esta aula?"
+              title="Tem certeza de que deseja excluir esta aula?"
               onConfirm={() => onDelete(record.id)}
               okText="Sim"
               cancelText="Cancelar"
             >
-              <Button
-                className="ifes-btn-danger"
-                shape="circle"
-                onClick={() => {}}
-              >
-                <DeleteOutlined className="ifes-icon" />
-              </Button>
+              <Button type="primary" danger shape="circle" icon={<DeleteOutlined />} />
             </Popconfirm>
           </Tooltip>
         </Space>
@@ -162,28 +243,12 @@ const Aulas: React.FC = () => {
     },
   ];
 
-  const formatTime = (input: any) => {
-    // Remove todos os caracteres que não são números
-    const cleanedInput = input.replace(/\D/g, '');
-  
-    // Limita o tamanho da entrada para 5 caracteres
-    const limitedInput = cleanedInput.slice(0, 4);
-  
-    // Adiciona ':' se necessário
-    if (limitedInput.length > 2) {
-      return limitedInput.slice(0, 2) + ':' + limitedInput.slice(2);
-    } else {
-      return limitedInput;
-    }
-  };
-  
   
   return (
     <>
       {/* Header */}
       <CardFooter>
         <div className="flex justify-content-between">
-          {/* Filtros */}
           <div className="flex filtros-card"></div>
 
           <div>
@@ -204,10 +269,10 @@ const Aulas: React.FC = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form form={form} layout="vertical" style={{ flex: 1 }}>
+        <Form form={form} layout="vertical">
         <Form.Item
             name="data"
-            label="Dia"
+            label="Data"
             rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
           
@@ -237,6 +302,63 @@ const Aulas: React.FC = () => {
           >
             <Input type="time" />
           </Form.Item>
+          <Form.Item
+            name="localId"
+            label="Local"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione o local!",
+              },
+            ]}
+          >
+            <Select>
+              {locais.map((local) => (
+                <Option key={local.id} value={local.id}>
+                  {local.descricao}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="professorId"
+            label="Professor"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione o professor!",
+              },
+            ]}
+          >
+            <Select>
+              {professores.map((professor) => (
+                <Option key={professor.id} value={professor.id}>
+                  {professor.nome}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+  name="periodoAcademicoId"
+  label="Período Acadêmico"
+  rules={[
+    {
+      required: true,
+      message: "Por favor, selecione o período acadêmico!",
+    },
+  ]}
+>
+  <Select>
+    {periodosAcademicos.map((periodo) => (
+      <Option key={periodo.id} value={periodo.id}>
+        {periodo.formato === "ANUAL"
+          ? periodo.ano
+          : `${periodo.ano}/${periodo.periodo}`}
+      </Option>
+    ))}
+  </Select>
+</Form.Item>
+
         </Form>
       </Modal>
     </>

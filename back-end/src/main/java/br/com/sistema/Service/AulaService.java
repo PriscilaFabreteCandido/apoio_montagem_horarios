@@ -9,6 +9,7 @@ import br.com.sistema.Model.Aula;
 import br.com.sistema.Model.Disciplina;
 import br.com.sistema.Repository.AulaRepository;
 import br.com.sistema.Repository.DisciplinaRepository;
+import br.com.sistema.Repository.PeriodoAcademicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,11 @@ public class AulaService {
     private final AulaRepository repository;
     private final AulaMapper mapper;
 
+    private final PeriodoAcademicoService periodoAcademicoService;
+
     public AulaDTO create(AulaDTO aulaDTO){
+
+        periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
 
         Aula entity = mapper.toEntity(aulaDTO);
         repository.save(entity);
@@ -31,6 +36,8 @@ public class AulaService {
 
     public AulaDTO update(AulaDTO aulaDTO, Long id){
         findById(id);
+
+        periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
 
         Aula entity = mapper.toEntity(aulaDTO);
         entity.setId(id);

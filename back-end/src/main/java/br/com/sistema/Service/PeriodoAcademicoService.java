@@ -65,7 +65,7 @@ public class PeriodoAcademicoService {
         return mapper.toDto(repository.findAll());
     }
 
-    private void validate(PeriodoAcademicoDTO periodoAcademicoDTO){
+    public void validate(PeriodoAcademicoDTO periodoAcademicoDTO){
         if(!periodoAcademicoDTO.getFormato().equals("SEMESTRAL") && !periodoAcademicoDTO.getFormato().equals("ANUAL")){
             throw new BusinessException("Formato inválido.");
         }
