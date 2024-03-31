@@ -13,7 +13,7 @@ import {
   TimePicker,
   Select
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
@@ -41,18 +41,28 @@ interface AulaType {
     periodo: number;
     formato: string;
   };
+  disciplina: {
+    id: number;
+    nome: string;
+  };
+  alunos: {
+    id: number;
+    nome: string;
+  }[];
 }
-
 
 const Aulas: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [aulaToEdit, setAulaToEdit] = useState<AulaType | null>(null);
   const [aulas, setAulas] = useState<any[]>([]);
-  const [locais, setLocais] = useState<any[]>([]); // Estado para armazenar os locais
-  const [professores, setProfessores] = useState<any[]>([]); // Estado para armazenar os professores
-  const [periodosAcademicos, setPeriodosAcademicos] = useState<any[]>([]); // Estado para armazenar os períodos acadêmicos
+  const [locais, setLocais] = useState<any[]>([]);
+  const [professores, setProfessores] = useState<any[]>([]);
+  const [periodosAcademicos, setPeriodosAcademicos] = useState<any[]>([]);
+  const [disciplinas, setDisciplinas] = useState<any[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
+  const [alunosSelecionados, setAlunosSelecionados] = useState<any[]>([]);
+  const [alunos, setAlunos] = useState<any[]>([]); 
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -103,11 +113,32 @@ const Aulas: React.FC = () => {
     }
   };
 
+  const getAlunos = async () => {
+    try {
+      const response = await get("alunos");
+      // Armazenar a lista de alunos
+      setAlunos(response);
+    } catch (error) {
+      console.error("Erro ao obter alunos:", error);
+    }
+  };
+
+  const getDisciplinas = async () => {
+    try {
+      const response = await get("disciplinas");
+      setDisciplinas(response);
+    } catch (error) {
+      console.error("Erro ao obter disciplinas:", error);
+    }
+  };
+
   useEffect(() => {
     getAulas();
     getLocais();
     getProfessores();
     getPeriodosAcademicos();
+    getDisciplinas();
+    getAlunos();
   }, []);
 
   const handleOk = async () => {
@@ -122,11 +153,12 @@ const Aulas: React.FC = () => {
         local: locais.find(local => local.id === values.localId),
         professor: professores.find(professor => professor.id === values.professorId),
         periodoAcademico: periodosAcademicos.find(periodo => periodo.id === values.periodoAcademicoId),
-        id: aulaToEdit ? aulaToEdit.id : null,
+        disciplina: disciplinas.find(disciplina => disciplina.id === values.disciplinaId),
+        alunos: alunosSelecionados.map(id => ({
+          id,
+          nome: alunos.find(aluno => aluno.id === id).nome
+        })),
       };
-      
-      
-      
 
       if (!aulaToEdit) {
         const response = await post("aulas/create", aulaData);
@@ -139,6 +171,7 @@ const Aulas: React.FC = () => {
       }
 
       handleCancel();
+  
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
@@ -153,6 +186,33 @@ const Aulas: React.FC = () => {
       console.error("Erro ao excluir aula:", error);
     }
   };
+
+ const viewAlunos = (alunos: any[] | null) => {
+  if (!alunos || alunos.length === 0) {
+    Modal.info({
+      title: "Alunos da Aula",
+      content: "Nenhum aluno matriculado nesta aula.",
+      onOk() {}
+    });
+  } else {
+    Modal.info({
+      title: "Alunos da Aula",
+      content: (
+        <ul>
+          {alunos.map(aluno => (
+            <li key={aluno.id}>{aluno.nome}</li>
+          ))}
+        </ul>
+      ),
+      onOk() {}
+    });
+  }
+};
+
+const renderAlunos = (alunosIds: number[]) => {
+  const alunosSelecionados = alunos.filter(aluno => alunosIds.includes(aluno.id));
+  return alunosSelecionados.map(aluno => aluno.nome).join(", ");
+};
 
   const columns: ColumnsType<AulaType> = [
     {
@@ -190,6 +250,14 @@ const Aulas: React.FC = () => {
       },
     },
     {
+      title: "Disciplina",
+      dataIndex: "disciplina",
+      key: "disciplina",
+      render: (disciplina: { id: number; nome: string }) => {
+        return disciplina ? disciplina.nome : "";
+      },
+    },
+    {
       title: "Período Acadêmico",
       dataIndex: "periodoAcademico",
       key: "periodoAcademico",
@@ -201,33 +269,48 @@ const Aulas: React.FC = () => {
           "";
       },
     },
-    
-    
+    {
+      title: "Alunos",
+      dataIndex: "alunos",
+      key: "alunos",
+      render: (alunosIds: number[]) => (
+        <Tooltip title="Visualizar Alunos">
+          <Button
+            type="link"
+            icon={<UnorderedListOutlined />}
+            onClick={() => viewAlunos(alunosIds)}
+          >
+            {renderAlunos(alunosIds)}
+          </Button>
+        </Tooltip>
+      ),
+    },
     {
       title: "Ações",
       key: "action",
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Editar">
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<EditOutlined />}
-          onClick={() => {
-            setAulaToEdit(record);
-            form.setFieldsValue({
-              data: moment(record.data).format("YYYY-MM-DD"),
-              horaInicio: moment(record.horaInicio, "HH:mm").format("HH:mm"),
-              horaFim: moment(record.horaFim, "HH:mm").format("HH:mm"),
-              localId: record.local.id,
-              professorId: record.professor.id,
-              periodoAcademicoId: record.periodoAcademico.id,
-            });
-            showModal();
-          }}
-        />
-      </Tooltip>
-
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setAulaToEdit(record);
+                form.setFieldsValue({
+                  data: moment(record.data).format("YYYY-MM-DD"),
+                  horaInicio: moment(record.horaInicio, "HH:mm").format("HH:mm"),
+                  horaFim: moment(record.horaFim, "HH:mm").format("HH:mm"),
+                  localId: record.local.id,
+                  professorId: record.professor.id,
+                  periodoAcademicoId: record.periodoAcademico.id,
+                  disciplinaId: record.disciplina.id,
+                  alunos: record.alunos.map(aluno => aluno.id)
+                });
+                showModal();
+              }}
+            />
+          </Tooltip>
           <Tooltip title="Excluir">
             <Popconfirm
               title="Tem certeza de que deseja excluir esta aula?"
@@ -243,14 +326,11 @@ const Aulas: React.FC = () => {
     },
   ];
 
-  
   return (
     <>
-      {/* Header */}
       <CardFooter>
         <div className="flex justify-content-between">
           <div className="flex filtros-card"></div>
-
           <div>
             <Button type="primary" onClick={showModal} icon={<PlusOutlined />}>
               Adicionar
@@ -258,11 +338,7 @@ const Aulas: React.FC = () => {
           </div>
         </div>
       </CardFooter>
-
-      {/* Tabela */}
       <Table columns={columns} dataSource={aulas} loading={loading} />
-
-      {/* Modal */}
       <Modal
         title="Adicionar Aula"
         visible={isOpenModal}
@@ -270,13 +346,12 @@ const Aulas: React.FC = () => {
         onCancel={handleCancel}
       >
         <Form form={form} layout="vertical">
-        <Form.Item
+          <Form.Item
             name="data"
             label="Data"
             rules={[{ required: true, message: "Por favor, insira o dia!" }]}
           >
-          
-          <Input type="date" />
+            <Input type="date" />
           </Form.Item>
           <Form.Item
             name="horaInicio"
@@ -313,13 +388,16 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {locais.map((local) => (
-                <Option key={local.id} value={local.id}>
-                  {local.descricao}
-                </Option>
-              ))}
+              {locais && locais.length > 0 &&
+                locais.map((local) => (
+                  <Option key={local.id} value={local.id}>
+                    {local.descricao}
+                  </Option>
+                ))
+              }
             </Select>
           </Form.Item>
+
           <Form.Item
             name="professorId"
             label="Professor"
@@ -331,33 +409,76 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {professores.map((professor) => (
-                <Option key={professor.id} value={professor.id}>
-                  {professor.nome}
-                </Option>
-              ))}
+              {professores && professores.length > 0 &&
+                professores.map((professor) => (
+                  <Option key={professor.id} value={professor.id}>
+                    {professor.nome}
+                  </Option>
+                ))
+              }
             </Select>
           </Form.Item>
           <Form.Item
-  name="periodoAcademicoId"
-  label="Período Acadêmico"
-  rules={[
-    {
-      required: true,
-      message: "Por favor, selecione o período acadêmico!",
-    },
-  ]}
->
-  <Select>
-    {periodosAcademicos.map((periodo) => (
-      <Option key={periodo.id} value={periodo.id}>
-        {periodo.formato === "ANUAL"
-          ? periodo.ano
-          : `${periodo.ano}/${periodo.periodo}`}
-      </Option>
-    ))}
-  </Select>
-</Form.Item>
+            name="periodoAcademicoId"
+            label="Período Acadêmico"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione o período acadêmico!",
+              },
+            ]}
+          >
+            <Select>
+              {periodosAcademicos && periodosAcademicos.length > 0 &&
+                periodosAcademicos.map((periodo) => (
+                  <Option key={periodo.id} value={periodo.id}>
+                    {periodo.formato === "ANUAL" ? periodo.ano : `${periodo.ano}/${periodo.periodo}`}
+                  </Option>
+                ))
+              }
+            </Select>
+          </Form.Item>
+
+        <Form.Item
+            name="disciplinaId"
+            label="Disciplina"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione a disciplina!",
+              },
+            ]}
+          >
+            <Select>
+              {disciplinas && disciplinas.length > 0 &&
+                disciplinas.map((disciplina) => (
+                  <Option key={disciplina.id} value={disciplina.id}>
+                    {disciplina.nome}
+                  </Option>
+                ))
+              }
+            </Select>
+          </Form.Item>
+
+     
+          <Form.Item
+            name="alunos"
+            label="Alunos"
+          >
+            <Select
+              mode="multiple"
+              placeholder="Selecione os alunos"
+              onChange={(selectedAlunos: any[]) => setAlunosSelecionados(selectedAlunos)}
+            >
+              {alunos && alunos.length > 0 &&
+                alunos.map((aluno) => (
+                  <Option key={aluno.id} value={aluno.id}>
+                    {aluno.nome}
+                  </Option>
+                ))
+              }
+            </Select>
+          </Form.Item>
 
         </Form>
       </Modal>

@@ -20,12 +20,17 @@ interface DisciplinaType {
   key: React.Key;
   id: number;
   nome: string;
+  curso: {
+    id: number;
+    nome: string;
+  };
 }
 
 const Disciplinas: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [disciplinaToEdit, setDisciplinaToEdit] = useState<DisciplinaType | null>(null);
   const [disciplinas, setDisciplinas] = useState<DisciplinaType[]>([]);
+  const [cursos, setCursos] = useState<any[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -51,8 +56,18 @@ const Disciplinas: React.FC = () => {
     }
   };
 
+  const getCursos = async () => {
+    try {
+      const response = await get("cursos");
+      setCursos(response);
+    } catch (error) {
+      console.error("Erro ao obter cursos:", error);
+    }
+  };
+
   useEffect(() => {
     getDisciplinas();
+    getCursos();
   }, []);
 
   const handleOk = async () => {
@@ -60,10 +75,11 @@ const Disciplinas: React.FC = () => {
       await form.validateFields();
       const values = form.getFieldsValue();
   
-      console.log("Objeto enviado para criação:", values); // Adicionando console.log para verificar o objeto enviado
+      console.log("Objeto enviado para criação:", values);
   
       const disciplinaData = {
         nome: values.nome,
+        curso: cursos.find(curso => curso.id === values.cursoId), // Obtendo o objeto do curso
         id: disciplinaToEdit ? disciplinaToEdit.id : null,
       };
   
@@ -107,6 +123,12 @@ const Disciplinas: React.FC = () => {
       dataIndex: "nome",
     },
     {
+      title: "Curso",
+      dataIndex: "curso",
+      render: (curso: { id: number; nome: string }) => curso ? curso.nome : "",
+    },
+    
+    {
       title: "Ações",
       key: "actions",
       render: (_, record) => (
@@ -118,7 +140,8 @@ const Disciplinas: React.FC = () => {
               onClick={() => {
                 setDisciplinaToEdit(record);
                 form.setFieldsValue({
-                  nome: record.nome
+                  nome: record.nome,
+                  cursoId: record.curso.id
                 });
                 setIsOpenModal(true);
               }}
@@ -182,6 +205,27 @@ const Disciplinas: React.FC = () => {
             ]}
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="cursoId"
+            label="Curso"
+            rules={[
+              { required: true, message: "Por favor, selecione o curso!" },
+            ]}
+          >
+            <Select>
+              {cursos.length > 0 ? (
+                cursos.map((curso) => (
+                  <Select.Option key={curso.id} value={curso.id}>
+                    {curso.nome}
+                  </Select.Option>
+                ))
+              ) : (
+                <Select.Option value={null} disabled>
+                  Nenhum curso cadastrado
+                </Select.Option>
+              )}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

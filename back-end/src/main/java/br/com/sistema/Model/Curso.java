@@ -22,5 +22,8 @@ public class Curso {
     private Coordenadoria coordenadoria;
 
     @OneToMany(mappedBy = "curso")
+    private List<Disciplina> disciplinas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "curso")
     private List<Aluno> alunos = new ArrayList<>();
 }
