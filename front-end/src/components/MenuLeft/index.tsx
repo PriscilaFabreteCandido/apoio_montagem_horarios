@@ -74,6 +74,7 @@ const items: MenuProps["items"] = [
   [
     getItem("Alunos", "alunos", <TeamOutlined />, "/Cadastros/Alunos"),
     getItem("Aulas", "aulas", <ClockCircleOutlined />, "/Cadastros/Aulas"),
+    getItem("Turmas", "turmas", <FundViewOutlined />, "/Cadastros/Turmas"),
     getItem("Cursos", "cursos", <FundViewOutlined />, "/Cadastros/Cursos"),
     getItem("Disciplinas", "disciplinas", <BookOutlined />, "/Cadastros/Disciplinas"),
     getItem("Coordenadoria", "coordenadoria", <ApartmentOutlined   />, "/Cadastros/Coordenadorias"),

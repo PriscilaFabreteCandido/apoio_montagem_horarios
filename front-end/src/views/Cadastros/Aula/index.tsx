@@ -10,7 +10,6 @@ import {
   message,
   Popconfirm,
   Space,
-  TimePicker,
   Select
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
@@ -62,7 +61,28 @@ const Aulas: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
   const [alunosSelecionados, setAlunosSelecionados] = useState<any[]>([]);
-  const [alunos, setAlunos] = useState<any[]>([]); 
+  const [alunos, setAlunos] = useState<any[]>([]);
+
+  const horariosFixos = [
+    { label: "07:00 às 07:50", value: ["07:00", "07:50"] },
+    { label: "07:55 às 08:45", value: ["07:55", "08:45"] },
+    { label: "08:50 às 09:40", value: ["08:50", "09:40"] },
+    { label: "10:00 às 10:50", value: ["10:00", "10:50"] },
+    { label: "10:55 às 11:45", value: ["10:55", "11:45"] },
+    { label: "11:50 às 12:40", value: ["11:50", "12:40"] },
+    { label: "12:50 às 13:40", value: ["12:50", "13:40"] },
+    { label: "13:45 às 14:35", value: ["13:45", "14:35"] },
+    { label: "14:40 às 15:30", value: ["14:40", "15:30"] },
+    { label: "15:50 às 16:40", value: ["15:50", "16:40"] },
+    { label: "16:45 às 17:35", value: ["16:45", "17:35"] },
+    { label: "17:40 às 18:30", value: ["17:40", "18:30"] },
+    { label: "18:50 às 19:35", value: ["18:50", "19:35"] },
+    { label: "19:35 às 20:20", value: ["19:35", "20:20"] },
+    { label: "20:30 às 21:15", value: ["20:30", "21:15"] },
+    { label: "21:15 às 22:00", value: ["21:15", "22:00"] },
+  ];
+  
+  
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -145,21 +165,25 @@ const Aulas: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
+      const horarioSelecionado = values.horario.split("-");
+      const horaInicio = horarioSelecionado[0];
+      const horaFim = horarioSelecionado[1];
+  
       const aulaData = {
         data: moment(values.data).format("YYYY-MM-DD"),
-        horaInicio: moment(values.horaInicio, "HH:mm").format("HH:mm:ss"),
-        horaFim: moment(values.horaFim, "HH:mm").format("HH:mm:ss"),
-        local: locais.find(local => local.id === values.localId),
-        professor: professores.find(professor => professor.id === values.professorId),
-        periodoAcademico: periodosAcademicos.find(periodo => periodo.id === values.periodoAcademicoId),
-        disciplina: disciplinas.find(disciplina => disciplina.id === values.disciplinaId),
-        alunos: alunosSelecionados.map(id => ({
+        horaInicio: moment(horaInicio, "HH:mm").format("HH:mm"),
+        horaFim: moment(horaFim, "HH:mm").format("HH:mm"),
+        local: locais.find((local) => local.id === values.localId),
+        professor: professores.find((professor) => professor.id === values.professorId),
+        periodoAcademico: periodosAcademicos.find((periodo) => periodo.id === values.periodoAcademicoId),
+        disciplina: disciplinas.find((disciplina) => disciplina.id === values.disciplinaId),
+        alunos: alunosSelecionados.map((id) => ({
           id,
-          nome: alunos.find(aluno => aluno.id === id).nome
+          nome: alunos.find((aluno) => aluno.id === id).nome
         })),
       };
-
+  
       if (!aulaToEdit) {
         const response = await post("aulas/create", aulaData);
         setAulas([...aulas, response]);
@@ -169,13 +193,16 @@ const Aulas: React.FC = () => {
         setAulas(aulas.map((a) => (a.id === response.id ? response : a)));
         message.success("Aula editada com sucesso");
       }
-
+  
       handleCancel();
   
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
+  
+  
 
   const onDelete = async (id: number) => {
     try {
@@ -187,32 +214,32 @@ const Aulas: React.FC = () => {
     }
   };
 
- const viewAlunos = (alunos: any[] | null) => {
-  if (!alunos || alunos.length === 0) {
-    Modal.info({
-      title: "Alunos da Aula",
-      content: "Nenhum aluno matriculado nesta aula.",
-      onOk() {}
-    });
-  } else {
-    Modal.info({
-      title: "Alunos da Aula",
-      content: (
-        <ul>
-          {alunos.map(aluno => (
-            <li key={aluno.id}>{aluno.nome}</li>
-          ))}
-        </ul>
-      ),
-      onOk() {}
-    });
-  }
-};
+  const viewAlunos = (alunos: any[] | null) => {
+    if (!alunos || alunos.length === 0) {
+      Modal.info({
+        title: "Alunos da Aula",
+        content: "Nenhum aluno matriculado nesta aula.",
+        onOk() { }
+      });
+    } else {
+      Modal.info({
+        title: "Alunos da Aula",
+        content: (
+          <ul>
+            {alunos.map(aluno => (
+              <li key={aluno.id}>{aluno.nome}</li>
+            ))}
+          </ul>
+        ),
+        onOk() { }
+      });
+    }
+  };
 
-const renderAlunos = (alunosIds: number[]) => {
-  const alunosSelecionados = alunos.filter(aluno => alunosIds.includes(aluno.id));
-  return alunosSelecionados.map(aluno => aluno.nome).join(", ");
-};
+  const renderAlunos = (alunosIds: number[]) => {
+    const alunosSelecionados = alunos.filter(aluno => alunosIds.includes(aluno.id));
+    return alunosSelecionados.map(aluno => aluno.nome).join(", ");
+  };
 
   const columns: ColumnsType<AulaType> = [
     {
@@ -261,11 +288,11 @@ const renderAlunos = (alunosIds: number[]) => {
       title: "Período Acadêmico",
       dataIndex: "periodoAcademico",
       key: "periodoAcademico",
-      render: (periodoAcademico: { ano: number; periodo: number; formato: string}) => {
-        return periodoAcademico ? 
-          periodoAcademico.formato === "ANUAL" ? 
-            periodoAcademico.ano : 
-            `${periodoAcademico.ano}/${periodoAcademico.periodo}` : 
+      render: (periodoAcademico: { ano: number; periodo: number; formato: string }) => {
+        return periodoAcademico ?
+          periodoAcademico.formato === "ANUAL" ?
+            periodoAcademico.ano :
+            `${periodoAcademico.ano}/${periodoAcademico.periodo}` :
           "";
       },
     },
@@ -290,27 +317,35 @@ const renderAlunos = (alunosIds: number[]) => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <Tooltip title="Editar">
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<EditOutlined />}
-              onClick={() => {
-                setAulaToEdit(record);
-                form.setFieldsValue({
-                  data: moment(record.data).format("YYYY-MM-DD"),
-                  horaInicio: moment(record.horaInicio, "HH:mm").format("HH:mm"),
-                  horaFim: moment(record.horaFim, "HH:mm").format("HH:mm"),
-                  localId: record.local.id,
-                  professorId: record.professor.id,
-                  periodoAcademicoId: record.periodoAcademico.id,
-                  disciplinaId: record.disciplina.id,
-                  alunos: record.alunos.map(aluno => aluno.id)
-                });
-                showModal();
-              }}
-            />
-          </Tooltip>
+        <Tooltip title="Editar">
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<EditOutlined />}
+          onClick={() => {
+            setAulaToEdit(record);
+
+            // Encontrar o horário correspondente
+            const horarioSelecionado = horariosFixos.find(
+              (horario) =>
+                horario.value[0] === moment(record.horaInicio, "HH:mm:ss").format("HH:mm") &&
+                horario.value[1] === moment(record.horaFim, "HH:mm:ss").format("HH:mm")
+            );
+
+            form.setFieldsValue({
+              data: moment(record.data).format("YYYY-MM-DD"),
+              horario: horarioSelecionado ? horarioSelecionado.value.join("-") : undefined,
+              localId: record.local.id,
+              professorId: record.professor.id,
+              periodoAcademicoId: record.periodoAcademico.id,
+              disciplinaId: record.disciplina.id,
+              alunos: record.alunos.map((aluno) => aluno.id),
+            });
+            showModal();
+          }}
+        />
+        </Tooltip>
+
           <Tooltip title="Excluir">
             <Popconfirm
               title="Tem certeza de que deseja excluir esta aula?"
@@ -354,29 +389,24 @@ const renderAlunos = (alunosIds: number[]) => {
             <Input type="date" />
           </Form.Item>
           <Form.Item
-            name="horaInicio"
-            label="Início"
+            name="horario"
+            label="Horário"
             rules={[
               {
                 required: true,
-                message: "Por favor, insira o horário de início!",
+                message: "Por favor, selecione o horário!",
               },
             ]}
           >
-            <Input type="time" />
+            <Select>
+              {horariosFixos.map((horario) => (
+                <Option key={horario.value.join("-")} value={horario.value.join("-")}>
+                  {horario.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item
-            name="horaFim"
-            label="Término"
-            rules={[
-              {
-                required: true,
-                message: "Por favor, insira o horário de término!",
-              },
-            ]}
-          >
-            <Input type="time" />
-          </Form.Item>
+
           <Form.Item
             name="localId"
             label="Local"
@@ -439,7 +469,7 @@ const renderAlunos = (alunosIds: number[]) => {
             </Select>
           </Form.Item>
 
-        <Form.Item
+          <Form.Item
             name="disciplinaId"
             label="Disciplina"
             rules={[
@@ -460,7 +490,6 @@ const renderAlunos = (alunosIds: number[]) => {
             </Select>
           </Form.Item>
 
-     
           <Form.Item
             name="alunos"
             label="Alunos"

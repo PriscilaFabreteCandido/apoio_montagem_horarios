@@ -17,6 +17,7 @@ import Cursos from "../views/Cadastros/Curso";
 import Alunos from "../views/Cadastros/Aluno";
 import Aulas from "../views/Cadastros/Aula";
 import Disciplinas from "../views/Cadastros/Disciplina";
+import Turmas from "../views/Cadastros/Turma";
 
 export interface RouteConfig {
   path: string;
@@ -59,6 +60,9 @@ const routes: RouteConfig[] = [
       { path: "Cadastros/Professores", element: <Professores />, permissions: "" },
       //Cursos
       { path: "Cadastros/Cursos", element: <Cursos />, permissions: "" },
+
+      { path: "Cadastros/Turmas", element: <Turmas />, permissions: "" },
+
       //Alunos
       { path: "Cadastros/Alunos", element: <Alunos />, permissions: "" },
       
