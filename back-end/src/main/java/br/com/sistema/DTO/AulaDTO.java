@@ -12,14 +12,13 @@ public class AulaDTO {
 
     private Long id;
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT-3")
-    private Date data;
+    private String diaSemana;
 
-    @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
-    private Date horaInicio;
+    private List<HorarioAulaDTO> horarios;
 
-    @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
-    private Date horaFim;
+    private Integer numeroAulas;
+
+    private TurmaDTO turma;
 
     private LocalDTO local;
 

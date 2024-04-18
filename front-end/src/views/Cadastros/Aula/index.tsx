@@ -10,9 +10,14 @@ import {
   message,
   Popconfirm,
   Space,
-  Select
+  Select,
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
 import { get, post, put, remove } from "../../../api/axios";
@@ -23,9 +28,8 @@ const { Option } = Select;
 interface AulaType {
   key: React.Key;
   id: number;
-  data: string;
-  horaInicio: string;
-  horaFim: string;
+  numeroAulas: number;
+  diaSemana: string;
   local: {
     id: number;
     descricao: string;
@@ -44,10 +48,15 @@ interface AulaType {
     id: number;
     nome: string;
   };
+  turma: {
+    id: number;
+    nome: string;
+  };
   alunos: {
     id: number;
     nome: string;
   }[];
+  horarios: { id: number; horaInicio: string; horaFim: string }[];
 }
 
 const Aulas: React.FC = () => {
@@ -58,31 +67,11 @@ const Aulas: React.FC = () => {
   const [professores, setProfessores] = useState<any[]>([]);
   const [periodosAcademicos, setPeriodosAcademicos] = useState<any[]>([]);
   const [disciplinas, setDisciplinas] = useState<any[]>([]);
+  const [turmas, setTurmas] = useState<any[]>([]); // Adicionado estado para turmas
+  const [horarios, setHorarios] = useState<any[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
-  const [alunosSelecionados, setAlunosSelecionados] = useState<any[]>([]);
   const [alunos, setAlunos] = useState<any[]>([]);
-
-  const horariosFixos = [
-    { label: "07:00 às 07:50", value: ["07:00", "07:50"] },
-    { label: "07:55 às 08:45", value: ["07:55", "08:45"] },
-    { label: "08:50 às 09:40", value: ["08:50", "09:40"] },
-    { label: "10:00 às 10:50", value: ["10:00", "10:50"] },
-    { label: "10:55 às 11:45", value: ["10:55", "11:45"] },
-    { label: "11:50 às 12:40", value: ["11:50", "12:40"] },
-    { label: "12:50 às 13:40", value: ["12:50", "13:40"] },
-    { label: "13:45 às 14:35", value: ["13:45", "14:35"] },
-    { label: "14:40 às 15:30", value: ["14:40", "15:30"] },
-    { label: "15:50 às 16:40", value: ["15:50", "16:40"] },
-    { label: "16:45 às 17:35", value: ["16:45", "17:35"] },
-    { label: "17:40 às 18:30", value: ["17:40", "18:30"] },
-    { label: "18:50 às 19:35", value: ["18:50", "19:35"] },
-    { label: "19:35 às 20:20", value: ["19:35", "20:20"] },
-    { label: "20:30 às 21:15", value: ["20:30", "21:15"] },
-    { label: "21:15 às 22:00", value: ["21:15", "22:00"] },
-  ];
-  
-  
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -136,7 +125,6 @@ const Aulas: React.FC = () => {
   const getAlunos = async () => {
     try {
       const response = await get("alunos");
-      // Armazenar a lista de alunos
       setAlunos(response);
     } catch (error) {
       console.error("Erro ao obter alunos:", error);
@@ -152,6 +140,24 @@ const Aulas: React.FC = () => {
     }
   };
 
+  const getHorarios = async () => {
+    try {
+      const response = await get("horarios");
+      setHorarios(response);
+    } catch (error) {
+      console.error("Erro ao obter horários:", error);
+    }
+  };
+
+  const getTurmas = async () => {
+    try {
+      const response = await get("turmas"); // Adicionar endpoint correto
+      setTurmas(response);
+    } catch (error) {
+      console.error("Erro ao obter turmas:", error);
+    }
+  };
+
   useEffect(() => {
     getAulas();
     getLocais();
@@ -159,31 +165,39 @@ const Aulas: React.FC = () => {
     getPeriodosAcademicos();
     getDisciplinas();
     getAlunos();
+    getHorarios();
+    getTurmas(); // Chamar a função para obter as turmas
   }, []);
 
   const handleOk = async () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-  
-      const horarioSelecionado = values.horario.split("-");
-      const horaInicio = horarioSelecionado[0];
-      const horaFim = horarioSelecionado[1];
-  
+
       const aulaData = {
-        data: moment(values.data).format("YYYY-MM-DD"),
-        horaInicio: moment(horaInicio, "HH:mm").format("HH:mm"),
-        horaFim: moment(horaFim, "HH:mm").format("HH:mm"),
+        diaSemana: values.diaSemana,
+        numeroAulas: values.numeroAulas,
         local: locais.find((local) => local.id === values.localId),
-        professor: professores.find((professor) => professor.id === values.professorId),
-        periodoAcademico: periodosAcademicos.find((periodo) => periodo.id === values.periodoAcademicoId),
-        disciplina: disciplinas.find((disciplina) => disciplina.id === values.disciplinaId),
-        alunos: alunosSelecionados.map((id) => ({
-          id,
-          nome: alunos.find((aluno) => aluno.id === id).nome
-        })),
+        professor: professores.find(
+          (professor) => professor.id === values.professorId
+        ),
+        periodoAcademico: periodosAcademicos.find(
+          (periodo) => periodo.id === values.periodoAcademicoId
+        ),
+        disciplina: disciplinas.find(
+          (disciplina) => disciplina.id === values.disciplinaId
+        ),
+        turma: turmas.find((turma) => turma.id === values.turmaId), // Passando o objeto completo da turma
+        alunos: values.alunos.map((id: number) =>
+          alunos.find((aluno) => aluno.id === id)
+        ),
+        horarios: values.horarios.map((id: number) =>
+          horarios.find((horario) => horario.id === id)
+        ),
       };
-  
+
+      console.log("Dados enviados para o backend:", aulaData); // Adicionando console.log com os dados
+
       if (!aulaToEdit) {
         const response = await post("aulas/create", aulaData);
         setAulas([...aulas, response]);
@@ -193,16 +207,12 @@ const Aulas: React.FC = () => {
         setAulas(aulas.map((a) => (a.id === response.id ? response : a)));
         message.success("Aula editada com sucesso");
       }
-  
+
       handleCancel();
-  
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
-  
-  
-  
 
   const onDelete = async (id: number) => {
     try {
@@ -219,54 +229,67 @@ const Aulas: React.FC = () => {
       Modal.info({
         title: "Alunos da Aula",
         content: "Nenhum aluno matriculado nesta aula.",
-        onOk() { }
+        onOk() {},
       });
     } else {
       Modal.info({
         title: "Alunos da Aula",
         content: (
           <ul>
-            {alunos.map(aluno => (
+            {alunos.map((aluno) => (
               <li key={aluno.id}>{aluno.nome}</li>
             ))}
           </ul>
         ),
-        onOk() { }
+        onOk() {},
       });
     }
   };
 
-  const renderAlunos = (alunosIds: number[]) => {
-    const alunosSelecionados = alunos.filter(aluno => alunosIds.includes(aluno.id));
-    return alunosSelecionados.map(aluno => aluno.nome).join(", ");
+  const renderAlunos = (alunosIds: number[] | null) => {
+    if (!alunosIds || alunosIds.length === 0) {
+      return "";
+    } else {
+      const alunosSelecionados = alunos.filter((aluno) =>
+        alunosIds.includes(aluno.id)
+      );
+      return alunosSelecionados.map((aluno) => aluno.nome).join(", ");
+    }
   };
 
   const columns: ColumnsType<AulaType> = [
     {
-      title: "Data",
-      dataIndex: "data",
-      render: (data: string) => moment(data).format("DD/MM/YYYY"),
-      sorter: (a: any, b: any) => moment(a.data).diff(moment(b.data)),
+      title: "Dia da semana",
+      dataIndex: "diaSemana",
+      key: "diaSemana",
     },
     {
-      title: "Início",
-      dataIndex: "horaInicio",
-      render: (horaInicio: string) => moment(horaInicio, "HH:mm:ss").format("HH:mm"),
-      sorter: (a: any, b: any) => moment(a.horaInicio, "HH:mm:ss").diff(moment(b.horaInicio, "HH:mm:ss")),
+      title: "Horários",
+      dataIndex: "horarios",
+      key: "horarios",
+      render: (horarios: any[]) => (
+        <ul>
+          {horarios &&
+            horarios.length > 0 &&
+            horarios.map((horario: any) => (
+              <li key={horario.id}>
+                {moment(horario.horaInicio, "HH:mm:ss").format("HH:mm")} -{" "}
+                {moment(horario.horaFim, "HH:mm:ss").format("HH:mm")}
+              </li>
+            ))}
+        </ul>
+      ),
     },
     {
-      title: "Término",
-      dataIndex: "horaFim",
-      render: (horaFim: string) => moment(horaFim, "HH:mm:ss").format("HH:mm"),
-      sorter: (a: any, b: any) => moment(a.horaFim, "HH:mm:ss").diff(moment(b.horaFim, "HH:mm:ss")),
+      title: "Número de Aulas",
+      dataIndex: "numeroAulas",
+      key: "numeroAulas",
     },
     {
       title: "Local",
       dataIndex: "local",
       key: "local",
-      render: (local: { id: number; descricao: string }) => {
-        return local ? local.descricao : "";
-      },
+      render: (local: any) => local.descricao,
     },
     {
       title: "Professor",
@@ -285,15 +308,27 @@ const Aulas: React.FC = () => {
       },
     },
     {
+      title: "Turma", // Adicionar coluna de turma
+      dataIndex: "turma",
+      key: "turma",
+      render: (turma: { id: number; nome: string }) => {
+        return turma ? turma.nome : "";
+      },
+    },
+    {
       title: "Período Acadêmico",
       dataIndex: "periodoAcademico",
       key: "periodoAcademico",
-      render: (periodoAcademico: { ano: number; periodo: number; formato: string }) => {
-        return periodoAcademico ?
-          periodoAcademico.formato === "ANUAL" ?
-            periodoAcademico.ano :
-            `${periodoAcademico.ano}/${periodoAcademico.periodo}` :
-          "";
+      render: (periodoAcademico: {
+        ano: number;
+        periodo: number;
+        formato: string;
+      }) => {
+        return periodoAcademico
+          ? periodoAcademico.formato === "ANUAL"
+            ? periodoAcademico.ano
+            : `${periodoAcademico.ano}/${periodoAcademico.periodo}`
+          : "";
       },
     },
     {
@@ -317,35 +352,28 @@ const Aulas: React.FC = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-        <Tooltip title="Editar">
-        <Button
-          type="primary"
-          shape="circle"
-          icon={<EditOutlined />}
-          onClick={() => {
-            setAulaToEdit(record);
-
-            // Encontrar o horário correspondente
-            const horarioSelecionado = horariosFixos.find(
-              (horario) =>
-                horario.value[0] === moment(record.horaInicio, "HH:mm:ss").format("HH:mm") &&
-                horario.value[1] === moment(record.horaFim, "HH:mm:ss").format("HH:mm")
-            );
-
-            form.setFieldsValue({
-              data: moment(record.data).format("YYYY-MM-DD"),
-              horario: horarioSelecionado ? horarioSelecionado.value.join("-") : undefined,
-              localId: record.local.id,
-              professorId: record.professor.id,
-              periodoAcademicoId: record.periodoAcademico.id,
-              disciplinaId: record.disciplina.id,
-              alunos: record.alunos.map((aluno) => aluno.id),
-            });
-            showModal();
-          }}
-        />
-        </Tooltip>
-
+          <Tooltip title="Editar">
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setAulaToEdit(record);
+                form.setFieldsValue({
+                  diaSemana: record.diaSemana,
+                  numeroAulas: record.numeroAulas,
+                  localId: record.local.id,
+                  professorId: record.professor.id,
+                  periodoAcademicoId: record.periodoAcademico.id,
+                  disciplinaId: record.disciplina.id,
+                  turmaId: record.turma.id, // Adicionar campo de turma
+                  alunos: record.alunos.map((aluno: any) => aluno.id),
+                  horarios: record.horarios.map((horario: any) => horario.id),
+                });
+                showModal();
+              }}
+            />
+          </Tooltip>
           <Tooltip title="Excluir">
             <Popconfirm
               title="Tem certeza de que deseja excluir esta aula?"
@@ -353,7 +381,12 @@ const Aulas: React.FC = () => {
               okText="Sim"
               cancelText="Cancelar"
             >
-              <Button type="primary" danger shape="circle" icon={<DeleteOutlined />} />
+              <Button
+                type="primary"
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+              />
             </Popconfirm>
           </Tooltip>
         </Space>
@@ -382,28 +415,55 @@ const Aulas: React.FC = () => {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            name="data"
-            label="Data"
-            rules={[{ required: true, message: "Por favor, insira o dia!" }]}
-          >
-            <Input type="date" />
-          </Form.Item>
-          <Form.Item
-            name="horario"
-            label="Horário"
+            name="diaSemana"
+            label="Dia da semana"
             rules={[
               {
                 required: true,
-                message: "Por favor, selecione o horário!",
+                message: "Por favor, selecione o dia da semana!",
               },
             ]}
           >
             <Select>
-              {horariosFixos.map((horario) => (
-                <Option key={horario.value.join("-")} value={horario.value.join("-")}>
-                  {horario.label}
-                </Option>
-              ))}
+              <Option value="SEGUNDA-FEIRA">Segunda-feira</Option>
+              <Option value="TERÇA-FEIRA">Terça-feira</Option>
+              <Option value="QUARTA-FEIRA">Quarta-feira</Option>
+              <Option value="QUINTA-FEIRA">Quinta-feira</Option>
+              <Option value="SEXTA-FEIRA">Sexta-feira</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="numeroAulas"
+            label="Número de Aulas"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, insira o número de aulas!",
+              },
+            ]}
+          >
+            <Input type="number" />
+          </Form.Item>
+
+          <Form.Item
+            name="horarios"
+            label="Horário"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione o(s) horário(s)!",
+              },
+            ]}
+          >
+            <Select mode="multiple" placeholder="Selecione os horários">
+              {horarios &&
+                horarios.length > 0 &&
+                horarios.map((horario) => (
+                  <Option key={horario.id} value={horario.id}>
+                    {moment(horario.horaInicio, "HH:mm:ss").format("HH:mm")} -{" "}
+                    {moment(horario.horaFim, "HH:mm:ss").format("HH:mm")}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
 
@@ -418,13 +478,13 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {locais && locais.length > 0 &&
+              {locais &&
+                locais.length > 0 &&
                 locais.map((local) => (
                   <Option key={local.id} value={local.id}>
                     {local.descricao}
                   </Option>
-                ))
-              }
+                ))}
             </Select>
           </Form.Item>
 
@@ -439,13 +499,13 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {professores && professores.length > 0 &&
+              {professores &&
+                professores.length > 0 &&
                 professores.map((professor) => (
                   <Option key={professor.id} value={professor.id}>
                     {professor.nome}
                   </Option>
-                ))
-              }
+                ))}
             </Select>
           </Form.Item>
           <Form.Item
@@ -459,13 +519,15 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {periodosAcademicos && periodosAcademicos.length > 0 &&
+              {periodosAcademicos &&
+                periodosAcademicos.length > 0 &&
                 periodosAcademicos.map((periodo) => (
                   <Option key={periodo.id} value={periodo.id}>
-                    {periodo.formato === "ANUAL" ? periodo.ano : `${periodo.ano}/${periodo.periodo}`}
+                    {periodo.formato === "ANUAL"
+                      ? periodo.ano
+                      : `${periodo.ano}/${periodo.periodo}`}
                   </Option>
-                ))
-              }
+                ))}
             </Select>
           </Form.Item>
 
@@ -480,35 +542,48 @@ const Aulas: React.FC = () => {
             ]}
           >
             <Select>
-              {disciplinas && disciplinas.length > 0 &&
+              {disciplinas &&
+                disciplinas.length > 0 &&
                 disciplinas.map((disciplina) => (
                   <Option key={disciplina.id} value={disciplina.id}>
                     {disciplina.nome}
                   </Option>
-                ))
-              }
+                ))}
             </Select>
           </Form.Item>
 
           <Form.Item
-            name="alunos"
-            label="Alunos"
+            name="turmaId"
+            label="Turma"
+            rules={[
+              {
+                required: true,
+                message: "Por favor, selecione a turma!",
+              },
+            ]}
           >
-            <Select
-              mode="multiple"
-              placeholder="Selecione os alunos"
-              onChange={(selectedAlunos: any[]) => setAlunosSelecionados(selectedAlunos)}
-            >
-              {alunos && alunos.length > 0 &&
+            <Select>
+              {turmas &&
+                turmas.length > 0 &&
+                turmas.map((turma) => (
+                  <Option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                  </Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="alunos" label="Alunos">
+            <Select mode="multiple" placeholder="Selecione os alunos">
+              {alunos &&
+                alunos.length > 0 &&
                 alunos.map((aluno) => (
                   <Option key={aluno.id} value={aluno.id}>
                     {aluno.nome}
                   </Option>
-                ))
-              }
+                ))}
             </Select>
           </Form.Item>
-
         </Form>
       </Modal>
     </>

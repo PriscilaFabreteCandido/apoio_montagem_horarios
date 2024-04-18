@@ -32,6 +32,7 @@ const Turmas: React.FC = () => {
     setLoading(true);
     try {
       const response: TurmaType[] = await get("turmas");
+      console.log("Dados das turmas obtidos com sucesso:", response); // Adicione este console.log
       setTurmas(response);
     } catch (error) {
       console.error("Erro ao obter turmas:", error);
@@ -57,16 +58,24 @@ const Turmas: React.FC = () => {
       if (!turmaToEdit) {
         const response = await post("turmas/create", turmaData);
         setTurmas([...turmas, response]);
-        message.success("Turma criada com sucesso");
+        console.log("Turmas atualizadas:", turmas); // Adicione este console.log
       } else {
         const response = await put(`turmas/update/${turmaToEdit.id}`, turmaData);
         setTurmas(turmas.map((turma) => (turma.id === response.id ? response : turma)));
         message.success("Turma editada com sucesso");
       }
 
-      handleCancel();
+      console.log("Chamando getTurmas após adicionar ou editar turma...");
+      getTurmas();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
+    } finally {
+      // Fechar a modal após a conclusão da operação, independentemente do resultado
+      setIsOpenModal(false);
+
+      // Limpar os campos do formulário e o estado de turma a ser editada
+      form.resetFields();
+      setTurmaToEdit(null);
     }
   };
 
@@ -141,9 +150,10 @@ const Turmas: React.FC = () => {
       {/* Tabela */}
       <Table columns={columns} dataSource={turmas} loading={loading} />
 
+
       {/* Modal */}
       <Modal
-        title="Adicionar Turma"
+        title={turmaToEdit ? "Editar Turma" : "Adicionar Turma"}
         visible={isOpenModal}
         onOk={handleOk}
         onCancel={handleCancel}

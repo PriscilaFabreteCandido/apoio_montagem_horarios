@@ -22,6 +22,7 @@ interface AlunoType {
   nome: string;
   matricula: string;
   curso: CursoType;
+  turma: TurmaType; // Adicionando turma ao tipo AlunoType
 }
 
 interface CursoType {
@@ -29,16 +30,21 @@ interface CursoType {
   nome: string;
 }
 
+interface TurmaType {
+  id: number;
+  nome: string;
+}
 
 const Alunos: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [alunoToEdit, setAlunoToEdit] = useState<AlunoType | null>(null);
   const [cursos, setCursos] = useState<CursoType[]>([]);
+  const [turmas, setTurmas] = useState<TurmaType[]>([]); // Adicionando turmas
   const [alunos, setAlunos] = useState<AlunoType[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
   const [cursoSelecionado, setCursoSelecionado] = useState<CursoType | null>(null);
-
+  const [turmaSelecionada, setTurmaSelecionada] = useState<TurmaType | null>(null); // Adicionando turmaSelecionada
 
   const showModal = () => {
     setIsOpenModal(true);
@@ -59,7 +65,15 @@ const Alunos: React.FC = () => {
     }
   };
 
-  
+  const getTurmas = async () => { // Função para obter as turmas
+    try {
+      const response: TurmaType[] = await get("turmas");
+      setTurmas(response);
+    } catch (error) {
+      console.error("Erro ao obter turmas:", error);
+    }
+  };
+
   const getAlunos = async () => {
     setLoading(true);
     try {
@@ -75,21 +89,22 @@ const Alunos: React.FC = () => {
   useEffect(() => {
     getAlunos();
     getCursos();
+    getTurmas(); // Chamando a função para obter as turmas ao montar o componente
   }, []);
-  
 
   const handleOk = async () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-  
+
       const alunoData = {
         nome: values.nome,
         matricula: values.matricula,
-        curso: cursoSelecionado, // Alterado para pegar o objeto do curso selecionado
+        curso: cursoSelecionado,
+        turma: turmaSelecionada, // Adicionando a turmaSelecionada ao alunoData
         id: alunoToEdit ? alunoToEdit.id : null,
       };
-  
+
       if (!alunoToEdit) {
         const response = await post("alunos/create", alunoData);
         setAlunos([...alunos, response]);
@@ -106,14 +121,12 @@ const Alunos: React.FC = () => {
         );
         message.success("Aluno editado com sucesso");
       }
-  
+
       handleCancel();
     } catch (error) {
       console.error("Erro ao processar o formulário:", error);
     }
   };
-  
-  
 
   const onDelete = async (id: number) => {
     try {
@@ -138,7 +151,12 @@ const Alunos: React.FC = () => {
       title: "Curso",
       dataIndex: "curso",
       render: (curso: CursoType | null) => curso ? curso.nome : 'N/A',
-    },    
+    },
+    {
+      title: "Turma", // Adicionando a coluna de turma
+      dataIndex: "turma",
+      render: (turma: TurmaType | null) => turma ? turma.nome : 'N/A',
+    },
     {
       title: "Ações",
       key: "actions",
@@ -153,7 +171,8 @@ const Alunos: React.FC = () => {
                 form.setFieldsValue({
                   nome: record.nome,
                   matricula: record.matricula,
-                  curso: record.curso.id
+                  curso: record.curso.id,
+                  turma: record.turma.id, // Definindo o valor da turma no formulário
                 });
                 setIsOpenModal(true);
               }}
@@ -181,7 +200,7 @@ const Alunos: React.FC = () => {
       ),
     },
   ];
-  
+
   return (
     <>
       {/* Header */}
@@ -234,25 +253,47 @@ const Alunos: React.FC = () => {
               { required: true, message: "Por favor, selecione o curso do aluno!" },
             ]}
           >
-          <Select
-            onChange={(cursoId) => {
-              const curso = cursos.find(curso => curso.id === cursoId);
-              if (curso) {
-                setCursoSelecionado(curso);
+            <Select
+              onChange={(cursoId) => {
+                const curso = cursos.find(curso => curso.id === cursoId);
+                if (curso) {
+                  setCursoSelecionado(curso);
+                }
+              }}
+            >
+              {cursos.length > 0 &&
+                cursos.map(curso => (
+                  <Select.Option key={curso.id} value={curso.id}>
+                    {curso.nome}
+                  </Select.Option>
+                ))
               }
-            }}
-          >
-            {cursos.length > 0 &&
-              cursos.map(curso => (
-                <Select.Option key={curso.id} value={curso.id}>
-                  {curso.nome}
-                </Select.Option>
-              ))
-            }
-          </Select>
+            </Select>
           </Form.Item>
-
-
+          <Form.Item
+            name="turma" // Adicionando o campo de turma no formulário
+            label="Turma"
+            rules={[
+              { required: true, message: "Por favor, selecione a turma do aluno!" },
+            ]}
+          >
+            <Select
+              onChange={(turmaId) => {
+                const turma = turmas.find(turma => turma.id === turmaId);
+                if (turma) {
+                  setTurmaSelecionada(turma);
+                }
+              }}
+            >
+              {turmas.length > 0 &&
+                turmas.map(turma => (
+                  <Select.Option key={turma.id} value={turma.id}>
+                    {turma.nome}
+                  </Select.Option>
+                ))
+              }
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </>

@@ -14,7 +14,12 @@ public class Aluno {
     @Column
     private String nome;
 
+    @Column(unique = true)
     private String matricula;
+
+    @ManyToOne
+    @JoinColumn(name = "turma_id")
+    private Turma turma;
 
     @ManyToOne
     @JoinColumn(name = "curso_id")

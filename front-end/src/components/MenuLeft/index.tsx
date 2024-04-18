@@ -81,6 +81,7 @@ const items: MenuProps["items"] = [
     getItem("Equipamentos", "equipamento", <LaptopOutlined    />, "/Cadastros/Equipamentos"),
     getItem("Locais", "Locais", <UsergroupAddOutlined />, "/Cadastros/Locais"),
     getItem("Professores", "professores", <ContactsOutlined    />, "/Cadastros/Professores"),
+    getItem("Horários de Aula", "Horarios", <ContactsOutlined    />, "/Cadastros/Horarios"),
     getItem("Semestre Letivos", "semestreLetivo", <HourglassOutlined   />, "/Cadastros/Semestres Letivos"),
     
     

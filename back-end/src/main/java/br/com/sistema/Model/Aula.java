@@ -14,18 +14,25 @@ public class Aula {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Temporal(TemporalType.DATE)
-    private Date data;
+    @Column
+    private String diaSemana;
 
-    @Temporal(TemporalType.TIME)
-    private Date horaInicio;
+    @ManyToMany
+    @JoinTable(name = "aula_horario",
+            joinColumns = @JoinColumn(name = "aula_id"),
+            inverseJoinColumns = @JoinColumn(name = "horario_id"))
+    private List<HorarioAula> horarios = new ArrayList<>();
 
-    @Temporal(TemporalType.TIME)
-    private Date horaFim;
+    @Column
+    private Integer numeroAulas;
 
     @ManyToOne
     @JoinColumn(name = "local_id")
     private Local local;
+
+    @ManyToOne
+    @JoinColumn(name = "turma_id")
+    private Turma turma;
 
     @ManyToOne
     @JoinColumn(name = "professor_id")

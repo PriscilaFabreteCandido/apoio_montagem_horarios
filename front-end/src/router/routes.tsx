@@ -18,6 +18,7 @@ import Alunos from "../views/Cadastros/Aluno";
 import Aulas from "../views/Cadastros/Aula";
 import Disciplinas from "../views/Cadastros/Disciplina";
 import Turmas from "../views/Cadastros/Turma";
+import HorariosAula from "../views/Cadastros/HorariosAula";
 
 export interface RouteConfig {
   path: string;
@@ -70,6 +71,8 @@ const routes: RouteConfig[] = [
       { path: "Cadastros/Aulas", element: <Aulas />, permissions: "" },
       //Aulas
       { path: "Cadastros/Disciplinas", element: <Disciplinas />, permissions: "" },
+
+      { path: "Cadastros/Horarios", element: <HorariosAula />, permissions: "" },
       
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
