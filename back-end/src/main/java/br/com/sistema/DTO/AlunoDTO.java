@@ -3,6 +3,8 @@ package br.com.sistema.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class AlunoDTO {
 
@@ -14,6 +16,9 @@ public class AlunoDTO {
     private TurmaDTO turma;
 
     private CursoDTO curso;
+
+    @JsonIgnoreProperties("alunos")
+    private List<AulaDTO> aulas;
 
     public AlunoDTO(Long id, String nome) {
         this.id = id;

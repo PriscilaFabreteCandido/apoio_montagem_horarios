@@ -3,6 +3,9 @@ package br.com.sistema.Model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 public class Aluno {
@@ -24,4 +27,7 @@ public class Aluno {
     @ManyToOne
     @JoinColumn(name = "curso_id")
     private Curso curso;
+
+    @ManyToMany(mappedBy = "alunos")
+    private List<Aula> aulas = new ArrayList<>();
 }

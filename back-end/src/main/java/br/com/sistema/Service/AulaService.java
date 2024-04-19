@@ -2,6 +2,9 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.AulaDTO;
 import br.com.sistema.DTO.DisciplinaDTO;
+import br.com.sistema.DTO.PeriodoAcademicoDTO;
+import br.com.sistema.Enum.FormatoAcademicoEnum;
+import br.com.sistema.Enum.PeriodoSemestreEnum;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.AulaMapper;
 import br.com.sistema.Mapper.DisciplinaMapper;
@@ -65,6 +68,23 @@ public class AulaService {
 
     public List<AulaDTO> findAll(){
         return mapper.toDto(repository.findAll());
+    }
+
+    public List<AulaDTO> findAulasByMatriculaAndPeriodoAcademico(String matricula,
+                                                                 String formato,
+                                                                 String periodo) {
+
+
+        PeriodoAcademicoDTO periodoAcademicoDTO = new PeriodoAcademicoDTO();
+        periodoAcademicoDTO.setPeriodo(periodo);
+        periodoAcademicoDTO.setFormato(formato);
+        periodoAcademicoService.validate(periodoAcademicoDTO);
+
+        FormatoAcademicoEnum formatoEnum = FormatoAcademicoEnum.valueOf(periodoAcademicoDTO.getFormato());
+        PeriodoSemestreEnum periodoEnum = PeriodoSemestreEnum.valueOf(periodoAcademicoDTO.getPeriodo());
+
+        List<Aula> aulas = repository.findAulasByMatriculaAndPeriodoAcademico(matricula, formatoEnum, periodoEnum);
+        return mapper.toDto(aulas);
     }
 
 }

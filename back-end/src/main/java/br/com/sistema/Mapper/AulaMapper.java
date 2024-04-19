@@ -1,6 +1,8 @@
 package br.com.sistema.Mapper;
 
+import br.com.sistema.DTO.AlunoDTO;
 import br.com.sistema.DTO.AulaDTO;
+import br.com.sistema.Model.Aluno;
 import br.com.sistema.Model.Aula;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

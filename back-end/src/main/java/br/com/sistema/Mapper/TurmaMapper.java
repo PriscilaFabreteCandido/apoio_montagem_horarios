@@ -9,23 +9,12 @@ import br.com.sistema.Model.Turma;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Mapper(componentModel = "spring")
 public interface TurmaMapper extends EntityMapper<TurmaDTO, Turma> {
 
-    @Mapping(target = "alunos", expression = "java(mapAlunos(turma))")
+    @Mapping(target = "alunos", ignore = true) // Ignora o atributo turma dentro de cada aluno
     TurmaDTO toDto(Turma turma);
 
-    default List<AlunoDTO> mapAlunos(Turma turma) {
-        return turma.getAlunos() != null ?
-                turma.getAlunos().stream().map(this::mapToAlunoDTO).collect(Collectors.toList()) :
-                Collections.emptyList();
-    }
-
-    default AlunoDTO mapToAlunoDTO(Aluno aluno) {
-        return new AlunoDTO(aluno.getId(), aluno.getNome());
-    }
+    @Mapping(target = "alunos", ignore = true)
+    Turma toEntity(TurmaDTO turmaDTO);
 }

@@ -2,6 +2,8 @@ package br.com.sistema.Controller;
 
 import br.com.sistema.DTO.AlunoDTO;
 import br.com.sistema.DTO.AulaDTO;
+import br.com.sistema.Enum.FormatoAcademicoEnum;
+import br.com.sistema.Enum.PeriodoSemestreEnum;
 import br.com.sistema.Service.AlunoService;
 import br.com.sistema.Service.AulaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,6 +52,15 @@ public class AulaController {
     public ResponseEntity<List<AulaDTO>> findAllAulas() {
         List<AulaDTO> aulaDTOList = aulaService.findAll();
         return new ResponseEntity<>(aulaDTOList, aulaDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+    }
+
+    @GetMapping("/aluno/{matricula}/{formato}/{periodo}")
+    public ResponseEntity<List<AulaDTO>> findAulasByMatriculaAndPeriodoAcademico(
+            @PathVariable String matricula,
+            @PathVariable String formato,
+            @PathVariable String periodo) {
+        List<AulaDTO> aulas = aulaService.findAulasByMatriculaAndPeriodoAcademico(matricula, formato, periodo);
+        return new ResponseEntity<>(aulas, HttpStatus.OK);
     }
 
 }

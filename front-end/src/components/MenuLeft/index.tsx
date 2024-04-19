@@ -91,7 +91,7 @@ const items: MenuProps["items"] = [
   getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR",
   [
     getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
-    getItem("Próxima aula", "proximaAula", <CalendarOutlined   />, "/Cadastros/Próxima aula"),
+    getItem("Próxima aula", "Proxima Aula", <CalendarOutlined   />, "/Consultas/Proxima Aula"),
   ],),
 ];
 

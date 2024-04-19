@@ -4,7 +4,7 @@ import RootLayout from "../layout";
 
 import Logout from "../views/app/Logout";
 
-import Consultas from "../views/Consultas";
+import Consultas from "../views/Consultas/ProximaAula";
 import Relatorios from "../views/Alocacoes";
 import Error404 from "../components/404";
 import Equipamentos from "../views/Cadastros/Equipamento";
@@ -19,6 +19,7 @@ import Aulas from "../views/Cadastros/Aula";
 import Disciplinas from "../views/Cadastros/Disciplina";
 import Turmas from "../views/Cadastros/Turma";
 import HorariosAula from "../views/Cadastros/HorariosAula";
+import ProximaAula from  "../views/Consultas/ProximaAula";
 
 export interface RouteConfig {
   path: string;
@@ -74,6 +75,7 @@ const routes: RouteConfig[] = [
 
       { path: "Cadastros/Horarios", element: <HorariosAula />, permissions: "" },
       
+      { path: "Consultas/Proxima Aula", element: <ProximaAula />, permissions: "" },
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       // {
