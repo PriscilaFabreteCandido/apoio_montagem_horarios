@@ -14,6 +14,9 @@ public class Disciplina {
     @Column
     private String nome;
 
+    @Column
+    private String sigla;
+
     @ManyToOne
     @JoinColumn(name = "curso_id")
     private Curso curso;

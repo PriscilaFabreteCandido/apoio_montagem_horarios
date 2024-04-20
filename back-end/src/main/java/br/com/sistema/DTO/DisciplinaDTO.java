@@ -7,6 +7,7 @@ public class DisciplinaDTO {
 
     private Long id;
     private String nome;
+    private String sigla;
 
     private CursoDTO curso;
 

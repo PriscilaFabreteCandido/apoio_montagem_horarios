@@ -15,4 +15,5 @@ public class HorarioAulaDTO {
 
     @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
     private Date horaFim;
+
 }

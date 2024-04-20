@@ -1,15 +1,13 @@
 package br.com.sistema.Service;
 
-import br.com.sistema.DTO.AulaDTO;
-import br.com.sistema.DTO.DisciplinaDTO;
-import br.com.sistema.DTO.PeriodoAcademicoDTO;
+import br.com.sistema.DTO.*;
 import br.com.sistema.Enum.FormatoAcademicoEnum;
 import br.com.sistema.Enum.PeriodoSemestreEnum;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.AulaMapper;
 import br.com.sistema.Mapper.DisciplinaMapper;
-import br.com.sistema.Model.Aula;
-import br.com.sistema.Model.Disciplina;
+import br.com.sistema.Model.*;
 import br.com.sistema.Repository.AulaRepository;
 import br.com.sistema.Repository.DisciplinaRepository;
 import br.com.sistema.Repository.PeriodoAcademicoRepository;
@@ -17,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +31,9 @@ public class AulaService {
         periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
 
         Aula entity = mapper.toEntity(aulaDTO);
+
+        validateAulaConflict(entity);
+
         repository.save(entity);
 
         return mapper.toDto(entity);
@@ -43,6 +45,9 @@ public class AulaService {
         periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
 
         Aula entity = mapper.toEntity(aulaDTO);
+
+        //validateExistingAula(entity);
+
         entity.setId(id);
         repository.save(entity);
 
@@ -74,17 +79,23 @@ public class AulaService {
                                                                  String formato,
                                                                  String periodo) {
 
-
-        PeriodoAcademicoDTO periodoAcademicoDTO = new PeriodoAcademicoDTO();
-        periodoAcademicoDTO.setPeriodo(periodo);
-        periodoAcademicoDTO.setFormato(formato);
-        periodoAcademicoService.validate(periodoAcademicoDTO);
-
-        FormatoAcademicoEnum formatoEnum = FormatoAcademicoEnum.valueOf(periodoAcademicoDTO.getFormato());
-        PeriodoSemestreEnum periodoEnum = PeriodoSemestreEnum.valueOf(periodoAcademicoDTO.getPeriodo());
+        FormatoAcademicoEnum formatoEnum = FormatoAcademicoEnum.valueOf(formato);
+        PeriodoSemestreEnum periodoEnum = PeriodoSemestreEnum.fromDescricao(periodo);
 
         List<Aula> aulas = repository.findAulasByMatriculaAndPeriodoAcademico(matricula, formatoEnum, periodoEnum);
         return mapper.toDto(aulas);
     }
 
+    private void validateAulaConflict(Aula aula) {
+        List<Aula> conflitingAulas = repository.findConflitingAulas(
+                aula.getDiaSemana(),
+                aula.getHorarios(),
+                aula.getProfessor().getId(),
+                aula.getLocal().getId()
+        );
+
+        if (!conflitingAulas.isEmpty()) {
+            throw new BusinessException("Existe um conflito de horários, ou professor ou o local já estão alocados nesse dia.");
+        }
+    }
 }

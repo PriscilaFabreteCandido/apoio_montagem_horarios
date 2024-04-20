@@ -15,6 +15,14 @@ public enum PeriodoSemestreEnum {
         return descricao;
     }
 
+    public static PeriodoSemestreEnum fromDescricao(String descricao) {
+        for (PeriodoSemestreEnum periodo : values()) {
+            if (periodo.descricao.equals(descricao)) {
+                return periodo;
+            }
+        }
+        return null; // ou lança uma exceção, dependendo do que você preferir
+    }
 
 
 }

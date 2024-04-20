@@ -123,9 +123,14 @@ const Alunos: React.FC = () => {
       }
 
       handleCancel();
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao processar o formulário:", error);
     }
+  };
+
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
   };
 
   const onDelete = async (id: number) => {
@@ -133,7 +138,8 @@ const Alunos: React.FC = () => {
       await remove(`alunos/delete/${id}`);
       setAlunos(alunos.filter((aluno) => aluno.id !== id));
       message.success("Aluno excluído com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir aluno:", error);
     }
   };

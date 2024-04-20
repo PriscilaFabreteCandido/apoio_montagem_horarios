@@ -52,4 +52,10 @@ public class AlunoController {
         return new ResponseEntity<>(alunoDTOList, alunoDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
+    @GetMapping("/matricula/{matricula}")
+    public ResponseEntity<AlunoDTO> findAlunoByMatricula(@PathVariable String matricula) {
+        System.out.println("Mostrando aluno: " + alunoService.findAlunoByMatricula(matricula));
+        return new ResponseEntity<>(alunoService.findAlunoByMatricula(matricula), HttpStatus.OK);
+    }
+
 }

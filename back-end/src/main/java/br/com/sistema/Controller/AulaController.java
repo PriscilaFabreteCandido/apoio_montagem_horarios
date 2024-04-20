@@ -60,6 +60,7 @@ public class AulaController {
             @PathVariable String formato,
             @PathVariable String periodo) {
         List<AulaDTO> aulas = aulaService.findAulasByMatriculaAndPeriodoAcademico(matricula, formato, periodo);
+        System.out.println("Mostrando dados: " + aulas);
         return new ResponseEntity<>(aulas, HttpStatus.OK);
     }
 

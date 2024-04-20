@@ -168,6 +168,10 @@ const Aulas: React.FC = () => {
     getHorarios();
     getTurmas(); // Chamar a função para obter as turmas
   }, []);
+  
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
+  };
 
   const handleOk = async () => {
     try {
@@ -209,7 +213,8 @@ const Aulas: React.FC = () => {
       }
 
       handleCancel();
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao processar o formulário:", error);
     }
   };
@@ -219,7 +224,8 @@ const Aulas: React.FC = () => {
       await remove(`aulas/delete/${id}`);
       setAulas(aulas.filter((aula) => aula.id !== id));
       message.success("Aula excluída com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir aula:", error);
     }
   };

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
+    boolean existsByMatricula(String matricula);
+    Aluno findByMatricula(String matricula);
 }

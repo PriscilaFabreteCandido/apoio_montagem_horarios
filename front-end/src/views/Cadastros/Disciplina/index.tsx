@@ -20,6 +20,7 @@ interface DisciplinaType {
   key: React.Key;
   id: number;
   nome: string;
+  sigla: string; // Adicione o atributo "sigla"
   curso: {
     id: number;
     nome: string;
@@ -79,6 +80,7 @@ const Disciplinas: React.FC = () => {
   
       const disciplinaData = {
         nome: values.nome,
+        sigla: values.sigla, // Adicione a sigla ao objeto da disciplina
         curso: cursos.find(curso => curso.id === values.cursoId), // Obtendo o objeto do curso
         id: disciplinaToEdit ? disciplinaToEdit.id : null,
       };
@@ -123,6 +125,10 @@ const Disciplinas: React.FC = () => {
       dataIndex: "nome",
     },
     {
+      title: "Sigla", // Adicione a coluna de sigla
+      dataIndex: "sigla",
+    },
+    {
       title: "Curso",
       dataIndex: "curso",
       render: (curso: { id: number; nome: string }) => curso ? curso.nome : "",
@@ -141,6 +147,7 @@ const Disciplinas: React.FC = () => {
                 setDisciplinaToEdit(record);
                 form.setFieldsValue({
                   nome: record.nome,
+                  sigla: record.sigla, // Definindo a sigla no formulário
                   cursoId: record.curso.id
                 });
                 setIsOpenModal(true);
@@ -202,6 +209,15 @@ const Disciplinas: React.FC = () => {
             label="Nome"
             rules={[
               { required: true, message: "Por favor, insira o nome da disciplina!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="sigla" // Adicione o campo de sigla no formulário
+            label="Sigla"
+            rules={[
+              { required: true, message: "Por favor, insira a sigla da disciplina!" },
             ]}
           >
             <Input />

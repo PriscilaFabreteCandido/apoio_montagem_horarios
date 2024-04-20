@@ -2,6 +2,7 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.AlunoDTO;
 import br.com.sistema.DTO.ProfessorDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.AlunoMapper;
 import br.com.sistema.Mapper.ProfessorMapper;
@@ -27,6 +28,14 @@ public class AlunoService {
 
     public AlunoDTO create(AlunoDTO alunoDTO){
 
+        System.out.println("PASSOU 1");
+
+        if (repository.existsByMatricula(alunoDTO.getMatricula())) {
+            throw new EntityNotFoundException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+        }
+
+        System.out.println("PASSOU 2");
+
         Aluno entity = mapper.toEntity(alunoDTO);
         repository.save(entity);
 
@@ -41,6 +50,11 @@ public class AlunoService {
     }
 
     public AlunoDTO update(AlunoDTO alunoDTO, Long id){
+
+        if (repository.existsByMatricula(alunoDTO.getMatricula())) {
+            throw new BusinessException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+        }
+
         findById(id);
 
         Aluno entity = mapper.toEntity(alunoDTO);
@@ -76,6 +90,16 @@ public class AlunoService {
 
     public List<AlunoDTO> findAll(){
         return mapper.toDto(repository.findAll());
+    }
+
+    public AlunoDTO findAlunoByMatricula(String matricula){
+        if (!repository.existsByMatricula(matricula)) {
+           throw new BusinessException("Aluno com matricula '" + matricula + "' não encontrado.");
+        }
+
+        Aluno entity = repository.findByMatricula(matricula);
+
+        return mapper.toDto(entity);
     }
 
 }
