@@ -97,9 +97,10 @@ const Equipamentos: React.FC = () => {
       
 
       handleCancel()
-    } catch (error) {
-      console.error("Erro ao processar o formulário:", error);
-      // Aqui você pode adicionar lógica para lidar com o erro, se necessário
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
     }
   };
 
@@ -113,6 +114,10 @@ const Equipamentos: React.FC = () => {
 
     }
   }
+
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
+  };
 
   const columns: ColumnsType<DataType> = [
     {

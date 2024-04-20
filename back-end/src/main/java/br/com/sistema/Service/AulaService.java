@@ -26,6 +26,8 @@ public class AulaService {
 
     private final PeriodoAcademicoService periodoAcademicoService;
 
+    private Long idProfessorAux = 0L;
+
     public AulaDTO create(AulaDTO aulaDTO){
 
         periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
@@ -42,11 +44,13 @@ public class AulaService {
     public AulaDTO update(AulaDTO aulaDTO, Long id){
         findById(id);
 
+        this.idProfessorAux = aulaDTO.getProfessor().getId();
+
         periodoAcademicoService.validate(aulaDTO.getPeriodoAcademico());
 
         Aula entity = mapper.toEntity(aulaDTO);
 
-        //validateExistingAula(entity);
+        validateAulaConflict(entity);
 
         entity.setId(id);
         repository.save(entity);
@@ -87,15 +91,34 @@ public class AulaService {
     }
 
     private void validateAulaConflict(Aula aula) {
-        List<Aula> conflitingAulas = repository.findConflitingAulas(
+        // Verificar se o local está alocado naquele dia e horário
+        List<Aula> conflictingAulasByLocal = repository.findConflitingAulasByLocal(
                 aula.getDiaSemana(),
                 aula.getHorarios(),
-                aula.getProfessor().getId(),
                 aula.getLocal().getId()
         );
 
-        if (!conflitingAulas.isEmpty()) {
-            throw new BusinessException("Existe um conflito de horários, ou professor ou o local já estão alocados nesse dia.");
+        if (!conflictingAulasByLocal.isEmpty()) {
+            Professor professor = conflictingAulasByLocal.get(0).getProfessor();
+            if(professor.getId() != this.idProfessorAux){
+                throw new BusinessException("Esse local já está alocado nesse dia e horário pelo professor: " + professor.getNome());
+            }
+
+        }
+
+        // Verificar se o professor já está dando aula naquele horário
+        List<Aula> conflictingAulasByProfessor = repository.findConflitingAulasByProfessor(
+                aula.getDiaSemana(),
+                aula.getHorarios(),
+                aula.getProfessor().getId()
+        );
+
+        if(aula.getProfessor().getId() != this.idProfessorAux) {
+            if (!conflictingAulasByProfessor.isEmpty()) {
+                throw new BusinessException("Esse professor já está dando aula neste horário.");
+            }
         }
     }
+
+
 }

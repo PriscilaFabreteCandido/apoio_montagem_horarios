@@ -25,6 +25,7 @@ public class AlunoService {
     private final AlunoMapper mapper;
 
     private final CursoRepository cursoRepository;
+    private final ProfessorRepository professorRepository;
 
     public AlunoDTO create(AlunoDTO alunoDTO){
 
@@ -32,6 +33,10 @@ public class AlunoService {
 
         if (repository.existsByMatricula(alunoDTO.getMatricula())) {
             throw new EntityNotFoundException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+        }
+
+        if (professorRepository.existsByMatricula(alunoDTO.getMatricula())) {
+            throw new EntityNotFoundException("Já existe um professor com a matrícula '" + alunoDTO.getMatricula() + "'.");
         }
 
         System.out.println("PASSOU 2");
@@ -53,6 +58,9 @@ public class AlunoService {
 
         if (repository.existsByMatricula(alunoDTO.getMatricula())) {
             throw new BusinessException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+        }
+        if (professorRepository.existsByMatricula(alunoDTO.getMatricula())) {
+            throw new EntityNotFoundException("Já existe um professor com a matrícula '" + alunoDTO.getMatricula() + "'.");
         }
 
         findById(id);

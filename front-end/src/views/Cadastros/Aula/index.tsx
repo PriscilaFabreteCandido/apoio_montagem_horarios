@@ -214,7 +214,9 @@ const Aulas: React.FC = () => {
 
       handleCancel();
     } catch (error: any) {
-      showError("Erro ao processar o formulário: " + error.response.data.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
       console.error("Erro ao processar o formulário:", error);
     }
   };
@@ -225,7 +227,9 @@ const Aulas: React.FC = () => {
       setAulas(aulas.filter((aula) => aula.id !== id));
       message.success("Aula excluída com sucesso");
     } catch (error: any) {
-      showError("Erro ao processar o formulário: " + error.response.data.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
       console.error("Erro ao excluir aula:", error);
     }
   };

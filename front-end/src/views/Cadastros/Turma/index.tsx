@@ -47,36 +47,41 @@ const Turmas: React.FC = () => {
 
   const handleOk = async () => {
     try {
-      await form.validateFields();
-      const values = form.getFieldsValue();
-
+      const values = await form.validateFields();
+  
       const turmaData = {
         nome: values.nome,
         id: turmaToEdit ? turmaToEdit.id : null,
       };
-
+  
       if (!turmaToEdit) {
         const response = await post("turmas/create", turmaData);
         setTurmas([...turmas, response]);
-        console.log("Turmas atualizadas:", turmas); // Adicione este console.log
+        message.success("Turma criada com sucesso");
       } else {
         const response = await put(`turmas/update/${turmaToEdit.id}`, turmaData);
         setTurmas(turmas.map((turma) => (turma.id === response.id ? response : turma)));
         message.success("Turma editada com sucesso");
       }
-
-      console.log("Chamando getTurmas após adicionar ou editar turma...");
-      getTurmas();
-    } catch (error) {
-      console.error("Erro ao processar o formulário:", error);
-    } finally {
-      // Fechar a modal após a conclusão da operação, independentemente do resultado
-      setIsOpenModal(false);
-
+  
       // Limpar os campos do formulário e o estado de turma a ser editada
       form.resetFields();
       setTurmaToEdit(null);
+    } catch (error: any) {
+      console.error("Erro ao processar o formulário:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
+  
+      return; // Não fecha a modal se a validação falhar
     }
+  
+    // Fechar a modal após a conclusão da operação
+    setIsOpenModal(false);
+  };
+  
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
   };
 
   const onDelete = async (id: number) => {

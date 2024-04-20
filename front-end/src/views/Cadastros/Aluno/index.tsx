@@ -124,7 +124,10 @@ const Alunos: React.FC = () => {
 
       handleCancel();
     } catch (error: any) {
-      showError("Erro ao processar o formulário: " + error.response.data.message);
+      // Verificar se há uma resposta de erro e exibir a mensagem, caso contrário, exibir uma mensagem genérica
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
       console.error("Erro ao processar o formulário:", error);
     }
   };

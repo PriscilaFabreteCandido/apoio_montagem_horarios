@@ -103,10 +103,17 @@ const Disciplinas: React.FC = () => {
       }
   
       handleCancel();
-    } catch (error) {
-      console.error("Erro ao processar o formulário:", error);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
     }
   };
+
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
+  };
+  
   
 
   const onDelete = async (id: number) => {

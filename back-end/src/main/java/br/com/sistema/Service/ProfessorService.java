@@ -2,11 +2,13 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.CursoDTO;
 import br.com.sistema.DTO.ProfessorDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.CursoMapper;
 import br.com.sistema.Mapper.ProfessorMapper;
 import br.com.sistema.Model.Curso;
 import br.com.sistema.Model.Professor;
+import br.com.sistema.Repository.AlunoRepository;
 import br.com.sistema.Repository.CursoRepository;
 import br.com.sistema.Repository.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,17 @@ public class ProfessorService {
     private final ProfessorRepository repository;
     private final ProfessorMapper mapper;
 
+    private final AlunoRepository alunoRepository;
+
     public ProfessorDTO create(ProfessorDTO professorDTO){
+
+        if (repository.existsByMatricula(professorDTO.getMatricula())) {
+            throw new BusinessException("Já existe um professor com a matrícula '" + professorDTO.getMatricula() + "'.");
+        }
+
+        if (alunoRepository.existsByMatricula(professorDTO.getMatricula())) {
+            throw new EntityNotFoundException("Já existe um aluno com a matrícula '" + professorDTO.getMatricula() + "'.");
+        }
 
         Professor entity = mapper.toEntity(professorDTO);
         repository.save(entity);
@@ -30,6 +42,15 @@ public class ProfessorService {
     }
 
     public ProfessorDTO update(ProfessorDTO professorDTO, Long id){
+
+        if (repository.existsByMatricula(professorDTO.getMatricula())) {
+            throw new BusinessException("Já existe um professor com a matrícula '" + professorDTO.getMatricula() + "'.");
+        }
+
+        if (alunoRepository.existsByMatricula(professorDTO.getMatricula())) {
+            throw new EntityNotFoundException("Já existe um aluno com a matrícula '" + professorDTO.getMatricula() + "'.");
+        }
+
         findById(id);
 
         Professor entity = mapper.toEntity(professorDTO);

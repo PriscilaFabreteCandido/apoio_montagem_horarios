@@ -33,12 +33,19 @@ public interface AulaRepository extends JpaRepository<Aula, Long> {
             "JOIN a.horarios h " +
             "WHERE a.diaSemana = :diaSemana " +
             "AND h IN :horarios " +
-            "AND a.professor.id = :professorId " +
             "AND a.local.id = :localId")
-    List<Aula> findConflitingAulas(@Param("diaSemana") String diaSemana,
-                                   @Param("horarios") List<HorarioAula> horarios,
-                                   @Param("professorId") Long professorId,
-                                   @Param("localId") Long localId);
+    List<Aula> findConflitingAulasByLocal(@Param("diaSemana") String diaSemana,
+                                          @Param("horarios") List<HorarioAula> horarios,
+                                          @Param("localId") Long localId);
+
+    @Query("SELECT a FROM Aula a " +
+            "JOIN a.horarios h " +
+            "WHERE a.diaSemana = :diaSemana " +
+            "AND h IN :horarios " +
+            "AND a.professor.id = :professorId")
+    List<Aula> findConflitingAulasByProfessor(@Param("diaSemana") String diaSemana,
+                                              @Param("horarios") List<HorarioAula> horarios,
+                                              @Param("professorId") Long professorId);
 
 
 }

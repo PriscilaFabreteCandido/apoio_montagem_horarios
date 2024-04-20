@@ -84,6 +84,10 @@ const Professores: React.FC = () => {
     getProfessores();
   }, []);
 
+  const showError = (errorMessage: string) => {
+    message.error(errorMessage);
+  };
+
   const handleOk = async () => {
     try {
       await form.validateFields();
@@ -119,7 +123,10 @@ const Professores: React.FC = () => {
       }
   
       handleCancel();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        showError("Erro ao processar o formulário: " + error.response.data.message);
+      }
       console.error("Erro ao processar o formulário:", error);
     }
   };
