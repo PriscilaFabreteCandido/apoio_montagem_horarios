@@ -18,10 +18,20 @@ interface Aula {
   disciplina: { id: number; nome: string; sigla: string };
 }
 
+interface Aluno {
+  id: number;
+  nome: string;
+  matricula: string;
+  turma: { id: number; nome: string };
+  curso: { id: number; nome: string; coordenadoria: { id: number; descricao: string } };
+  aulas: Aula[] | null;
+}
+
 const HorarioTable = () => {
   const [periodosLetivos, setPeriodosLetivos] = useState<PeriodoAcademico[]>([]);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<PeriodoAcademico | null>(null);
   const [matricula, setMatricula] = useState<string>("");
+  const [aluno, setAluno] = useState<Aluno | null>(null);
   const [aulas, setAulas] = useState<Aula[]>([]);
 
   const setPeriodosAcademicos = async () => {
@@ -55,10 +65,19 @@ const HorarioTable = () => {
     } catch (error) {
       console.error("Erro ao obter próxima aula:", error);
     }
+    
+    try {
+      const alunoResponse = await get(`alunos/matricula/${matricula}`);
+      console.log("Dados do aluno:", alunoResponse);
+      setAluno(alunoResponse);
+    } catch (error) {
+      console.error("Erro ao obter dados do aluno:", error);
+    }
   };
 
   const handleLimparAulasClick = () => {
     setAulas([]);
+    setAluno(null);
   };
 
   const renderPeriodoAcademico = (periodoAcademico: PeriodoAcademico) => {
@@ -124,6 +143,34 @@ const HorarioTable = () => {
     return tabela;
   };
 
+  const renderizarTabelaAluno = () => {
+    if (aluno) {
+      return (
+        <table className="table-container info-table">
+          <tbody>
+            <tr>
+              <th>Aluno</th>
+              <td>{aluno.nome}</td>
+            </tr>
+            <tr>
+              <th>Matrícula</th>
+              <td>{aluno.matricula}</td>
+            </tr>
+            <tr>
+              <th>Curso</th>
+              <td>{aluno.curso.nome}</td>
+            </tr>
+            <tr>
+              <th>Turma</th>
+              <td>{aluno.turma.nome}</td>
+            </tr>
+          </tbody>
+        </table>
+      );
+    }
+    return null;
+  };
+
   return (
     <div>
       <style>
@@ -144,6 +191,13 @@ const HorarioTable = () => {
             background-color: #f2f2f2;
             font-weight: bold;
           }
+
+          .info-table {
+            width: auto;
+            margin-top: 10px;
+            margin-bottom: 50px;
+          }
+
         `}
       </style>
 
@@ -160,6 +214,7 @@ const HorarioTable = () => {
           style={{ width: 200, marginRight: "16px" }}
           value={matricula}
           onChange={(e) => setMatricula(e.target.value)}
+          onPressEnter={handleVerProximaAulaClick}
         />
         <Button type="primary" onClick={handleVerProximaAulaClick}>
           Ver aulas
@@ -168,6 +223,8 @@ const HorarioTable = () => {
           Limpar
         </Button>
       </div>
+
+      {renderizarTabelaAluno()}
 
       <table className="table-container">
         <thead>
