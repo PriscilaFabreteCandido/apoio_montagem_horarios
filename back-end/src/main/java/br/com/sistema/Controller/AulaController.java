@@ -54,14 +54,16 @@ public class AulaController {
         return new ResponseEntity<>(aulaDTOList, aulaDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
-    @GetMapping("/aluno/{matricula}/{formato}/{periodo}")
+    @GetMapping("/aluno/{matricula}/{formato}/{periodo}/{ano}")
     public ResponseEntity<List<AulaDTO>> findAulasByMatriculaAndPeriodoAcademico(
             @PathVariable String matricula,
             @PathVariable String formato,
-            @PathVariable String periodo) {
-        List<AulaDTO> aulas = aulaService.findAulasByMatriculaAndPeriodoAcademico(matricula, formato, periodo);
+            @PathVariable String periodo,
+            @PathVariable int ano) {
+        List<AulaDTO> aulas = aulaService.findAulasByMatriculaAndPeriodoAcademico(matricula, formato, periodo, ano);
         System.out.println("Mostrando dados: " + aulas);
         return new ResponseEntity<>(aulas, HttpStatus.OK);
     }
+
 
 }

@@ -81,17 +81,19 @@ public class AulaService {
 
     public List<AulaDTO> findAulasByMatriculaAndPeriodoAcademico(String matricula,
                                                                  String formato,
-                                                                 String periodo) {
+                                                                 String periodo,
+                                                                 int ano) {
 
         FormatoAcademicoEnum formatoEnum = FormatoAcademicoEnum.valueOf(formato);
         PeriodoSemestreEnum periodoEnum = PeriodoSemestreEnum.fromDescricao(periodo);
 
-        List<Aula> aulas = repository.findAulasByMatriculaAndPeriodoAcademico(matricula, formatoEnum, periodoEnum);
+        List<Aula> aulas = repository.findAulasByMatriculaAndPeriodoAcademico(matricula, formatoEnum, periodoEnum, ano);
         return mapper.toDto(aulas);
     }
 
+
     private void validateAulaConflict(Aula aula) {
-        // Verificar se o local está alocado naquele dia e horário
+
         List<Aula> conflictingAulasByLocal = repository.findConflitingAulasByLocal(
                 aula.getDiaSemana(),
                 aula.getHorarios(),

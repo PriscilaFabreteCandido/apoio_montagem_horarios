@@ -51,4 +51,10 @@ public class ProfessorController {
         List<ProfessorDTO> professorDTOList = professorService.findAll();
         return new ResponseEntity<>(professorDTOList, professorDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
+
+    @GetMapping("/matricula/{matricula}")
+    public ResponseEntity<ProfessorDTO> findProfessorByMatricula(@PathVariable String matricula) {
+        System.out.println("Mostrando professor: " + professorService.findProfessorByMatricula(matricula));
+        return new ResponseEntity<>(professorService.findProfessorByMatricula(matricula), HttpStatus.OK);
+    }
 }

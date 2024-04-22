@@ -21,12 +21,17 @@ public interface AulaRepository extends JpaRepository<Aula, Long> {
     @Query("SELECT DISTINCT a FROM Aula a " +
             "JOIN FETCH a.periodoAcademico p " +
             "JOIN a.alunos al " +
-            "WHERE al.matricula = :matricula " +
+            "JOIN a.professor pr " +
+            "WHERE al.matricula = :matricula OR pr.matricula = :matricula " + // Adicione um espaço aqui
             "AND p.formato = :formato " +
-            "AND p.periodo = :periodo")
+            "AND p.periodo = :periodo " +
+            "AND p.ano = :ano")
     List<Aula> findAulasByMatriculaAndPeriodoAcademico(@Param("matricula") String matricula,
                                                        @Param("formato") FormatoAcademicoEnum formato,
-                                                       @Param("periodo") PeriodoSemestreEnum periodo);
+                                                       @Param("periodo") PeriodoSemestreEnum periodo,
+                                                       @Param("ano") int ano);
+
+
 
 
     @Query("SELECT a FROM Aula a " +

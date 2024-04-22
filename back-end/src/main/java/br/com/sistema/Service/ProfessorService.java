@@ -81,6 +81,17 @@ public class ProfessorService {
         return mapper.toDto(repository.findAll());
     }
 
+    public ProfessorDTO findProfessorByMatricula(String matricula){
+        if (!repository.existsByMatricula(matricula)) {
+            throw new BusinessException("Professor com matricula '" + matricula + "' não encontrado.");
+        }
+
+        Professor entity = repository.findByMatricula(matricula);
+
+        return mapper.toDto(entity);
+    }
+
+
     private void validate(ProfessorDTO professorDTO){
         if(!professorDTO.getCoordenador()){
             professorDTO.setCoordenador(false);

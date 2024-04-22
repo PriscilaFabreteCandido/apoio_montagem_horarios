@@ -96,15 +96,15 @@ const Alunos: React.FC = () => {
     try {
       await form.validateFields();
       const values = form.getFieldsValue();
-
+  
       const alunoData = {
         nome: values.nome,
         matricula: values.matricula,
-        curso: cursoSelecionado,
-        turma: turmaSelecionada, // Adicionando a turmaSelecionada ao alunoData
+        curso: cursoSelecionado, // Passando o objeto cursoSelecionado
+        turma: turmaSelecionada, // Passando o objeto turmaSelecionada
         id: alunoToEdit ? alunoToEdit.id : null,
       };
-
+  
       if (!alunoToEdit) {
         const response = await post("alunos/create", alunoData);
         setAlunos([...alunos, response]);
@@ -121,7 +121,7 @@ const Alunos: React.FC = () => {
         );
         message.success("Aluno editado com sucesso");
       }
-
+  
       handleCancel();
     } catch (error: any) {
       // Verificar se há uma resposta de erro e exibir a mensagem, caso contrário, exibir uma mensagem genérica
@@ -131,6 +131,7 @@ const Alunos: React.FC = () => {
       console.error("Erro ao processar o formulário:", error);
     }
   };
+  
 
   const showError = (errorMessage: string) => {
     message.error(errorMessage);
@@ -172,20 +173,33 @@ const Alunos: React.FC = () => {
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Editar">
-            <Button
-              className="ifes-btn-warning"
-              shape="circle"
-              onClick={() => {
-                setAlunoToEdit(record);
-                form.setFieldsValue({
-                  nome: record.nome,
-                  matricula: record.matricula,
-                  curso: record.curso.id,
-                  turma: record.turma.id, // Definindo o valor da turma no formulário
-                });
-                setIsOpenModal(true);
-              }}
-            >
+          <Button
+  className="ifes-btn-warning"
+  shape="circle"
+  onClick={() => {
+    setAlunoToEdit(record);
+    form.setFieldsValue({
+      nome: record.nome,
+      matricula: record.matricula,
+      curso: record.curso.id, // Definindo o ID do curso no formulário
+      turma: record.turma.id, // Definindo o ID da turma no formulário
+    });
+    
+    // Definindo o cursoSelecionado e turmaSelecionada
+    const selectedCurso = cursos.find(curso => curso.id === record.curso.id);
+    if (selectedCurso) {
+      setCursoSelecionado(selectedCurso);
+    }
+
+    const selectedTurma = turmas.find(turma => turma.id === record.turma.id);
+    if (selectedTurma) {
+      setTurmaSelecionada(selectedTurma);
+    }
+
+    setIsOpenModal(true);
+  }}
+>
+
               <EditOutlined className="ifes-icon" />
             </Button>
           </Tooltip>

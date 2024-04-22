@@ -30,11 +30,19 @@ interface Aluno {
   aulas: Aula[] | null;
 }
 
+interface Professor {
+  id: number;
+  nome: string;
+  matricula: string;
+}
+
+
 const HorarioTable = () => {
   const [periodosLetivos, setPeriodosLetivos] = useState<PeriodoAcademico[]>([]);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<PeriodoAcademico | null>(null);
   const [matricula, setMatricula] = useState<string>("");
   const [aluno, setAluno] = useState<Aluno | null>(null);
+  const [professor, setProfessor] = useState<Professor | null>(null);
   const [aulas, setAulas] = useState<Aula[]>([]);
 
   const setPeriodosAcademicos = async () => {
@@ -60,6 +68,20 @@ const HorarioTable = () => {
     }
   };
 
+  const carregarTabela = async () => {
+
+    try {
+      const response = await get(`aulas/aluno/${matricula}/${periodoSelecionado?.formato}/${periodoSelecionado?.periodo}/${periodoSelecionado?.ano}`);
+      console.log("Próximas aulas:", response);
+      setAulas(response);
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
+      console.error("Erro ao obter próxima aula:", error);
+    }
+   
+    
+  }
+
   const handleVerProximaAulaClick = async () => {
     // Verificar se o período acadêmico foi selecionado
     if (!periodoSelecionado) {
@@ -72,25 +94,35 @@ const HorarioTable = () => {
       showError("Por favor, insira a matrícula do aluno.");
       return;
     }
-  
+   
     try {
-      const response = await get(`aulas/aluno/${matricula}/${periodoSelecionado?.formato}/${periodoSelecionado?.id}`);
-      console.log("Próximas aulas:", response);
-      setAulas(response);
-    } catch (error: any) {
-      showError("Erro ao processar o formulário: " + error.response.data.message);
-      console.error("Erro ao obter próxima aula:", error);
+      handleLimparAulasClick();
+      const professorResponse = await get(`professores/matricula/${matricula}`);
+      console.log("Dados do professor:", professorResponse);
+      setProfessor(professorResponse);
+      renderizarTabelaProfessor(); // Chamada para renderizar a tabela do professor
+      carregarTabela()
+      return;
+    } catch (error) {
+      handleLimparAulasClick();
     }
+   
     
     try {
+      handleLimparAulasClick();
       const alunoResponse = await get(`alunos/matricula/${matricula}`);
       console.log("Dados do aluno:", alunoResponse);
       setAluno(alunoResponse);
-    } catch (error: any) {
+      renderizarTabelaAluno(); // Chamada para renderizar a tabela do aluno
+      carregarTabela();
+      return;
+    } catch (error) {
       handleLimparAulasClick();
-      showError("Erro ao processar o formulário: " + error.response.data.message);
-      console.error("Erro ao obter dados do aluno:", error);
     }
+
+    showError("Matrícula não encontrada.");
+  
+
   };
   
 
@@ -101,6 +133,7 @@ const HorarioTable = () => {
   const handleLimparAulasClick = () => {
     setAulas([]);
     setAluno(null);
+    setProfessor(null);
   };
 
   const renderPeriodoAcademico = (periodoAcademico: PeriodoAcademico) => {
@@ -200,6 +233,27 @@ const renderizarTabela = () => {
   return tabela;
 };
 
+const renderizarTabelaProfessor = () => {
+
+  if (professor) {
+    return (
+      <table className="table-container info-table">
+        <tbody>
+          <tr>
+            <th>Professor</th>
+            <td>{professor.nome}</td>
+          </tr>
+          <tr>
+            <th>Matrícula</th>
+            <td>{professor.matricula}</td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
+  return null;
+};
+
   const renderizarTabelaAluno = () => {
     if (aluno) {
       return (
@@ -287,7 +341,8 @@ const renderizarTabela = () => {
         </Button>
       </div>
 
-      {renderizarTabelaAluno()}
+      {aluno && renderizarTabelaAluno()} {/* Renderiza a tabela do aluno se houver dados de aluno */}
+      {professor && renderizarTabelaProfessor()}
 
       <table className="table-container">
         <thead>
