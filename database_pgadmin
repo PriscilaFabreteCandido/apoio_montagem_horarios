@@ -1,0 +1,1867 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.4
+-- Dumped by pg_dump version 15.4
+
+-- Started on 2024-04-22 19:21:20
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 243 (class 1259 OID 21316)
+-- Name: acao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.acao (
+    id bigint NOT NULL,
+    local_realizacao character varying(255),
+    nome character varying(255),
+    qtd_participantes integer,
+    qtd_vagas integer,
+    instituicao_id bigint,
+    projeto_id bigint,
+    tipo_acao_id bigint
+);
+
+
+ALTER TABLE public.acao OWNER TO postgres;
+
+--
+-- TOC entry 242 (class 1259 OID 21315)
+-- Name: acao_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.acao_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.acao_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3540 (class 0 OID 0)
+-- Dependencies: 242
+-- Name: acao_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.acao_id_seq OWNED BY public.acao.id;
+
+
+--
+-- TOC entry 215 (class 1259 OID 21126)
+-- Name: aluno; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.aluno (
+    curso_id bigint,
+    id bigint NOT NULL,
+    turma_id bigint,
+    matricula character varying(255),
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.aluno OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 21125)
+-- Name: aluno_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.aluno_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.aluno_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3541 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: aluno_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.aluno_id_seq OWNED BY public.aluno.id;
+
+
+--
+-- TOC entry 217 (class 1259 OID 21137)
+-- Name: aula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.aula (
+    numero_aulas integer,
+    disciplina_id bigint,
+    id bigint NOT NULL,
+    local_id bigint,
+    periodo_academico_id bigint,
+    professor_id bigint,
+    turma_id bigint,
+    dia_semana character varying(255)
+);
+
+
+ALTER TABLE public.aula OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 21143)
+-- Name: aula_aluno; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.aula_aluno (
+    aluno_id bigint NOT NULL,
+    aula_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.aula_aluno OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 21146)
+-- Name: aula_horario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.aula_horario (
+    aula_id bigint NOT NULL,
+    horario_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.aula_horario OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 21136)
+-- Name: aula_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.aula_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.aula_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3542 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: aula_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.aula_id_seq OWNED BY public.aula.id;
+
+
+--
+-- TOC entry 221 (class 1259 OID 21150)
+-- Name: coordenadoria; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.coordenadoria (
+    id bigint NOT NULL,
+    descricao character varying(255)
+);
+
+
+ALTER TABLE public.coordenadoria OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 21149)
+-- Name: coordenadoria_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.coordenadoria_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.coordenadoria_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3543 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: coordenadoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.coordenadoria_id_seq OWNED BY public.coordenadoria.id;
+
+
+--
+-- TOC entry 223 (class 1259 OID 21157)
+-- Name: curso; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.curso (
+    coordenadoria_id bigint,
+    id bigint NOT NULL,
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.curso OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 21156)
+-- Name: curso_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.curso_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.curso_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3544 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: curso_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.curso_id_seq OWNED BY public.curso.id;
+
+
+--
+-- TOC entry 225 (class 1259 OID 21164)
+-- Name: disciplina; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.disciplina (
+    curso_id bigint,
+    id bigint NOT NULL,
+    nome character varying(255),
+    sigla character varying(255)
+);
+
+
+ALTER TABLE public.disciplina OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 21163)
+-- Name: disciplina_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.disciplina_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.disciplina_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3545 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: disciplina_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.disciplina_id_seq OWNED BY public.disciplina.id;
+
+
+--
+-- TOC entry 227 (class 1259 OID 21173)
+-- Name: equipamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.equipamento (
+    id bigint NOT NULL,
+    descricao character varying(255)
+);
+
+
+ALTER TABLE public.equipamento OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 21172)
+-- Name: equipamento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.equipamento_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.equipamento_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3546 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: equipamento_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.equipamento_id_seq OWNED BY public.equipamento.id;
+
+
+--
+-- TOC entry 229 (class 1259 OID 21180)
+-- Name: evento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.evento (
+    data date,
+    hora_fim time(6) without time zone,
+    hora_inicio time(6) without time zone,
+    id bigint NOT NULL,
+    descricao character varying(255)
+);
+
+
+ALTER TABLE public.evento OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 21179)
+-- Name: evento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.evento_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.evento_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3547 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: evento_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.evento_id_seq OWNED BY public.evento.id;
+
+
+--
+-- TOC entry 245 (class 1259 OID 21325)
+-- Name: funcao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.funcao (
+    id bigint NOT NULL,
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.funcao OWNER TO postgres;
+
+--
+-- TOC entry 244 (class 1259 OID 21324)
+-- Name: funcao_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.funcao_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.funcao_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3548 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: funcao_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.funcao_id_seq OWNED BY public.funcao.id;
+
+
+--
+-- TOC entry 231 (class 1259 OID 21187)
+-- Name: horario_aula; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.horario_aula (
+    hora_fim time(6) without time zone,
+    hora_inicio time(6) without time zone,
+    id bigint NOT NULL
+);
+
+
+ALTER TABLE public.horario_aula OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 21186)
+-- Name: horario_aula_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.horario_aula_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.horario_aula_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3549 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: horario_aula_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.horario_aula_id_seq OWNED BY public.horario_aula.id;
+
+
+--
+-- TOC entry 247 (class 1259 OID 21332)
+-- Name: instituicao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.instituicao (
+    id bigint NOT NULL,
+    avenida character varying(255),
+    cep character varying(255),
+    descricao character varying(255),
+    nome character varying(255),
+    numero character varying(255),
+    rua character varying(255)
+);
+
+
+ALTER TABLE public.instituicao OWNER TO postgres;
+
+--
+-- TOC entry 246 (class 1259 OID 21331)
+-- Name: instituicao_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.instituicao_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.instituicao_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3550 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: instituicao_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.instituicao_id_seq OWNED BY public.instituicao.id;
+
+
+--
+-- TOC entry 233 (class 1259 OID 21194)
+-- Name: local; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.local (
+    capacidade integer,
+    id bigint NOT NULL,
+    descricao character varying(255)
+);
+
+
+ALTER TABLE public.local OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 21201)
+-- Name: local_equipamento; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.local_equipamento (
+    quantidade integer,
+    equipamento_id bigint,
+    id bigint NOT NULL,
+    local_id bigint
+);
+
+
+ALTER TABLE public.local_equipamento OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 21200)
+-- Name: local_equipamento_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.local_equipamento_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.local_equipamento_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3551 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: local_equipamento_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.local_equipamento_id_seq OWNED BY public.local_equipamento.id;
+
+
+--
+-- TOC entry 232 (class 1259 OID 21193)
+-- Name: local_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.local_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.local_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3552 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: local_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.local_id_seq OWNED BY public.local.id;
+
+
+--
+-- TOC entry 237 (class 1259 OID 21208)
+-- Name: periodo_academico; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.periodo_academico (
+    ano integer,
+    data_fim date,
+    data_inicio date,
+    id bigint NOT NULL,
+    formato character varying(255),
+    periodo character varying(255),
+    CONSTRAINT periodo_academico_formato_check CHECK (((formato)::text = ANY ((ARRAY['SEMESTRAL'::character varying, 'ANUAL'::character varying])::text[]))),
+    CONSTRAINT periodo_academico_periodo_check CHECK (((periodo)::text = ANY ((ARRAY['PRIMEIRO_PERIODO'::character varying, 'SEGUNDO_PERIODO'::character varying, 'NENHUM'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.periodo_academico OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 21207)
+-- Name: periodo_academico_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.periodo_academico_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.periodo_academico_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3553 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: periodo_academico_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.periodo_academico_id_seq OWNED BY public.periodo_academico.id;
+
+
+--
+-- TOC entry 249 (class 1259 OID 21341)
+-- Name: pessoa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pessoa (
+    id bigint NOT NULL,
+    cpf character varying(255),
+    dt_nascimento date,
+    email character varying(255),
+    matricula character varying(255),
+    nivel_escolaridade character varying(255),
+    nome character varying(255),
+    senha character varying(255),
+    funcao_id bigint,
+    instituicao_id bigint
+);
+
+
+ALTER TABLE public.pessoa OWNER TO postgres;
+
+--
+-- TOC entry 248 (class 1259 OID 21340)
+-- Name: pessoa_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pessoa_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pessoa_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3554 (class 0 OID 0)
+-- Dependencies: 248
+-- Name: pessoa_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pessoa_id_seq OWNED BY public.pessoa.id;
+
+
+--
+-- TOC entry 239 (class 1259 OID 21219)
+-- Name: professor; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.professor (
+    coordenador boolean,
+    coordenadoria_id bigint,
+    id bigint NOT NULL,
+    matricula character varying(255),
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.professor OWNER TO postgres;
+
+--
+-- TOC entry 238 (class 1259 OID 21218)
+-- Name: professor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.professor_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.professor_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3555 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: professor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.professor_id_seq OWNED BY public.professor.id;
+
+
+--
+-- TOC entry 251 (class 1259 OID 21350)
+-- Name: projeto; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.projeto (
+    id bigint NOT NULL,
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.projeto OWNER TO postgres;
+
+--
+-- TOC entry 250 (class 1259 OID 21349)
+-- Name: projeto_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.projeto_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.projeto_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3556 (class 0 OID 0)
+-- Dependencies: 250
+-- Name: projeto_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.projeto_id_seq OWNED BY public.projeto.id;
+
+
+--
+-- TOC entry 253 (class 1259 OID 21357)
+-- Name: tipo_acao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tipo_acao (
+    id bigint NOT NULL,
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.tipo_acao OWNER TO postgres;
+
+--
+-- TOC entry 252 (class 1259 OID 21356)
+-- Name: tipo_acao_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tipo_acao_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tipo_acao_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3557 (class 0 OID 0)
+-- Dependencies: 252
+-- Name: tipo_acao_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tipo_acao_id_seq OWNED BY public.tipo_acao.id;
+
+
+--
+-- TOC entry 241 (class 1259 OID 21228)
+-- Name: turma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.turma (
+    id bigint NOT NULL,
+    nome character varying(255)
+);
+
+
+ALTER TABLE public.turma OWNER TO postgres;
+
+--
+-- TOC entry 240 (class 1259 OID 21227)
+-- Name: turma_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.turma_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.turma_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3558 (class 0 OID 0)
+-- Dependencies: 240
+-- Name: turma_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.turma_id_seq OWNED BY public.turma.id;
+
+
+--
+-- TOC entry 3284 (class 2604 OID 22417)
+-- Name: acao id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.acao ALTER COLUMN id SET DEFAULT nextval('public.acao_id_seq'::regclass);
+
+
+--
+-- TOC entry 3271 (class 2604 OID 22418)
+-- Name: aluno id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aluno ALTER COLUMN id SET DEFAULT nextval('public.aluno_id_seq'::regclass);
+
+
+--
+-- TOC entry 3272 (class 2604 OID 22419)
+-- Name: aula id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula ALTER COLUMN id SET DEFAULT nextval('public.aula_id_seq'::regclass);
+
+
+--
+-- TOC entry 3273 (class 2604 OID 22420)
+-- Name: coordenadoria id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.coordenadoria ALTER COLUMN id SET DEFAULT nextval('public.coordenadoria_id_seq'::regclass);
+
+
+--
+-- TOC entry 3274 (class 2604 OID 22421)
+-- Name: curso id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.curso ALTER COLUMN id SET DEFAULT nextval('public.curso_id_seq'::regclass);
+
+
+--
+-- TOC entry 3275 (class 2604 OID 22422)
+-- Name: disciplina id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.disciplina ALTER COLUMN id SET DEFAULT nextval('public.disciplina_id_seq'::regclass);
+
+
+--
+-- TOC entry 3276 (class 2604 OID 22423)
+-- Name: equipamento id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.equipamento ALTER COLUMN id SET DEFAULT nextval('public.equipamento_id_seq'::regclass);
+
+
+--
+-- TOC entry 3277 (class 2604 OID 22424)
+-- Name: evento id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.evento ALTER COLUMN id SET DEFAULT nextval('public.evento_id_seq'::regclass);
+
+
+--
+-- TOC entry 3285 (class 2604 OID 22425)
+-- Name: funcao id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.funcao ALTER COLUMN id SET DEFAULT nextval('public.funcao_id_seq'::regclass);
+
+
+--
+-- TOC entry 3278 (class 2604 OID 22426)
+-- Name: horario_aula id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.horario_aula ALTER COLUMN id SET DEFAULT nextval('public.horario_aula_id_seq'::regclass);
+
+
+--
+-- TOC entry 3286 (class 2604 OID 22427)
+-- Name: instituicao id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.instituicao ALTER COLUMN id SET DEFAULT nextval('public.instituicao_id_seq'::regclass);
+
+
+--
+-- TOC entry 3279 (class 2604 OID 22428)
+-- Name: local id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local ALTER COLUMN id SET DEFAULT nextval('public.local_id_seq'::regclass);
+
+
+--
+-- TOC entry 3280 (class 2604 OID 22429)
+-- Name: local_equipamento id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local_equipamento ALTER COLUMN id SET DEFAULT nextval('public.local_equipamento_id_seq'::regclass);
+
+
+--
+-- TOC entry 3281 (class 2604 OID 22430)
+-- Name: periodo_academico id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.periodo_academico ALTER COLUMN id SET DEFAULT nextval('public.periodo_academico_id_seq'::regclass);
+
+
+--
+-- TOC entry 3287 (class 2604 OID 22431)
+-- Name: pessoa id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pessoa ALTER COLUMN id SET DEFAULT nextval('public.pessoa_id_seq'::regclass);
+
+
+--
+-- TOC entry 3282 (class 2604 OID 22432)
+-- Name: professor id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.professor ALTER COLUMN id SET DEFAULT nextval('public.professor_id_seq'::regclass);
+
+
+--
+-- TOC entry 3288 (class 2604 OID 22433)
+-- Name: projeto id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.projeto ALTER COLUMN id SET DEFAULT nextval('public.projeto_id_seq'::regclass);
+
+
+--
+-- TOC entry 3289 (class 2604 OID 22434)
+-- Name: tipo_acao id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tipo_acao ALTER COLUMN id SET DEFAULT nextval('public.tipo_acao_id_seq'::regclass);
+
+
+--
+-- TOC entry 3283 (class 2604 OID 22435)
+-- Name: turma id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.turma ALTER COLUMN id SET DEFAULT nextval('public.turma_id_seq'::regclass);
+
+
+--
+-- TOC entry 3524 (class 0 OID 21316)
+-- Dependencies: 243
+-- Data for Name: acao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.acao (id, local_realizacao, nome, qtd_participantes, qtd_vagas, instituicao_id, projeto_id, tipo_acao_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3496 (class 0 OID 21126)
+-- Dependencies: 215
+-- Data for Name: aluno; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.aluno (curso_id, id, turma_id, matricula, nome) FROM stdin;
+1	4	1	20211227601000	Luis Gustavo Leal Rossim
+1	1	1	2021122760291	William Debortoli Carvalho
+1	3	1	002	Priscila Fabrete Cândido
+1	2	1	001	Joao Paulo da Silva
+\.
+
+
+--
+-- TOC entry 3498 (class 0 OID 21137)
+-- Dependencies: 217
+-- Data for Name: aula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.aula (numero_aulas, disciplina_id, id, local_id, periodo_academico_id, professor_id, turma_id, dia_semana) FROM stdin;
+60	1	2	1	1	1	1	SEGUNDA-FEIRA
+60	2	3	2	1	2	1	TERÇA-FEIRA
+60	3	4	4	1	3	1	QUARTA-FEIRA
+60	3	5	6	1	6	1	QUARTA-FEIRA
+60	4	6	5	1	5	1	QUINTA-FEIRA
+60	5	7	3	1	4	1	SEXTA-FEIRA
+\.
+
+
+--
+-- TOC entry 3499 (class 0 OID 21143)
+-- Dependencies: 218
+-- Data for Name: aula_aluno; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.aula_aluno (aluno_id, aula_id) FROM stdin;
+1	2
+2	2
+3	2
+4	2
+1	3
+2	3
+3	3
+4	3
+1	4
+2	4
+4	4
+3	5
+4	6
+3	6
+2	6
+1	6
+1	7
+2	7
+3	7
+4	7
+1	2
+2	2
+3	2
+4	2
+1	3
+2	3
+3	3
+4	3
+1	4
+2	4
+4	4
+3	5
+4	6
+3	6
+2	6
+1	6
+1	7
+2	7
+3	7
+4	7
+\.
+
+
+--
+-- TOC entry 3500 (class 0 OID 21146)
+-- Dependencies: 219
+-- Data for Name: aula_horario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.aula_horario (aula_id, horario_id) FROM stdin;
+2	92
+2	93
+2	94
+2	95
+3	93
+3	94
+3	95
+3	96
+4	93
+4	94
+4	95
+4	96
+7	93
+7	94
+7	95
+7	96
+2	92
+2	93
+2	94
+2	95
+3	93
+3	94
+3	95
+3	96
+4	93
+4	94
+4	95
+4	96
+7	93
+7	94
+7	95
+7	96
+5	93
+5	94
+5	95
+5	96
+6	93
+6	94
+6	95
+6	96
+5	93
+5	94
+5	95
+5	96
+6	93
+6	94
+6	95
+6	96
+\.
+
+
+--
+-- TOC entry 3502 (class 0 OID 21150)
+-- Dependencies: 221
+-- Data for Name: coordenadoria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.coordenadoria (id, descricao) FROM stdin;
+1	Coordenadoria de Informática
+2	Coordenadoria de Administração
+3	Coordenadoria de Infraestrutura
+\.
+
+
+--
+-- TOC entry 3504 (class 0 OID 21157)
+-- Dependencies: 223
+-- Data for Name: curso; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.curso (coordenadoria_id, id, nome) FROM stdin;
+1	1	Sistemas de Informação
+2	2	Administração
+3	3	Arquitetura e Urbanismo
+\.
+
+
+--
+-- TOC entry 3506 (class 0 OID 21164)
+-- Dependencies: 225
+-- Data for Name: disciplina; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.disciplina (curso_id, id, nome, sigla) FROM stdin;
+1	1	Laboratório de Engenharia de Software	LES
+1	2	Gestão de Sistemas de Informação	GSI
+1	3	Projeto de Diplomação I	PD1
+1	4	Administração da Produção e Logistíca	APL
+1	5	Comércio Eletrônico	CE
+\.
+
+
+--
+-- TOC entry 3508 (class 0 OID 21173)
+-- Dependencies: 227
+-- Data for Name: equipamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.equipamento (id, descricao) FROM stdin;
+1	Computador
+2	Ar condicionado
+3	Projetor
+\.
+
+
+--
+-- TOC entry 3510 (class 0 OID 21180)
+-- Dependencies: 229
+-- Data for Name: evento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.evento (data, hora_fim, hora_inicio, id, descricao) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3526 (class 0 OID 21325)
+-- Dependencies: 245
+-- Data for Name: funcao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.funcao (id, nome) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3512 (class 0 OID 21187)
+-- Dependencies: 231
+-- Data for Name: horario_aula; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.horario_aula (hora_fim, hora_inicio, id) FROM stdin;
+07:50:00	07:00:00	81
+08:40:00	07:50:00	82
+09:30:00	08:40:00	83
+10:40:00	09:50:00	84
+11:30:00	10:40:00	85
+12:20:00	11:30:00	86
+13:50:00	13:00:00	87
+14:40:00	13:50:00	88
+15:30:00	14:40:00	89
+16:40:00	15:50:00	90
+17:30:00	16:40:00	91
+18:20:00	17:30:00	92
+19:35:00	18:50:00	93
+20:20:00	19:35:00	94
+21:15:00	20:30:00	95
+22:00:00	21:15:00	96
+\.
+
+
+--
+-- TOC entry 3528 (class 0 OID 21332)
+-- Dependencies: 247
+-- Data for Name: instituicao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.instituicao (id, avenida, cep, descricao, nome, numero, rua) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3514 (class 0 OID 21194)
+-- Dependencies: 233
+-- Data for Name: local; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.local (capacidade, id, descricao) FROM stdin;
+32	1	Laboratório 09
+28	2	Laboratório 07
+28	3	Laboratório 08
+24	4	Laboratório 04
+36	5	Sala 1142
+28	6	Laboratório 10
+\.
+
+
+--
+-- TOC entry 3516 (class 0 OID 21201)
+-- Dependencies: 235
+-- Data for Name: local_equipamento; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.local_equipamento (quantidade, equipamento_id, id, local_id) FROM stdin;
+32	1	1	1
+2	2	2	1
+1	3	3	1
+28	1	4	2
+1	2	5	2
+1	3	6	2
+28	1	7	3
+1	2	8	3
+1	3	9	3
+24	1	10	4
+1	2	11	4
+1	3	12	4
+1	2	13	5
+1	3	14	5
+28	1	15	6
+1	2	16	6
+1	3	17	6
+\.
+
+
+--
+-- TOC entry 3518 (class 0 OID 21208)
+-- Dependencies: 237
+-- Data for Name: periodo_academico; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.periodo_academico (ano, data_fim, data_inicio, id, formato, periodo) FROM stdin;
+2024	2024-07-01	2024-02-01	1	SEMESTRAL	PRIMEIRO_PERIODO
+\.
+
+
+--
+-- TOC entry 3530 (class 0 OID 21341)
+-- Dependencies: 249
+-- Data for Name: pessoa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pessoa (id, cpf, dt_nascimento, email, matricula, nivel_escolaridade, nome, senha, funcao_id, instituicao_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3520 (class 0 OID 21219)
+-- Dependencies: 239
+-- Data for Name: professor; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.professor (coordenador, coordenadoria_id, id, matricula, nome) FROM stdin;
+f	1	1	1	Igor Carlos Pulini
+f	1	2	2	Diego Rossi Mafiolett
+f	1	3	3	Vanderson José Idelfonso Silva
+f	1	4	4	Eduardo Max Amaral
+f	1	5	5	Sulyana CMSI
+t	1	6	6	Gustavo Ludovico Guidoni
+\.
+
+
+--
+-- TOC entry 3532 (class 0 OID 21350)
+-- Dependencies: 251
+-- Data for Name: projeto; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.projeto (id, nome) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3534 (class 0 OID 21357)
+-- Dependencies: 253
+-- Data for Name: tipo_acao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tipo_acao (id, nome) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3522 (class 0 OID 21228)
+-- Dependencies: 241
+-- Data for Name: turma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.turma (id, nome) FROM stdin;
+1	V02
+\.
+
+
+--
+-- TOC entry 3559 (class 0 OID 0)
+-- Dependencies: 242
+-- Name: acao_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.acao_id_seq', 1, false);
+
+
+--
+-- TOC entry 3560 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: aluno_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.aluno_id_seq', 4, true);
+
+
+--
+-- TOC entry 3561 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: aula_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.aula_id_seq', 7, true);
+
+
+--
+-- TOC entry 3562 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: coordenadoria_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.coordenadoria_id_seq', 3, true);
+
+
+--
+-- TOC entry 3563 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: curso_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.curso_id_seq', 3, true);
+
+
+--
+-- TOC entry 3564 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: disciplina_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.disciplina_id_seq', 5, true);
+
+
+--
+-- TOC entry 3565 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: equipamento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.equipamento_id_seq', 3, true);
+
+
+--
+-- TOC entry 3566 (class 0 OID 0)
+-- Dependencies: 228
+-- Name: evento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.evento_id_seq', 1, false);
+
+
+--
+-- TOC entry 3567 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: funcao_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.funcao_id_seq', 1, false);
+
+
+--
+-- TOC entry 3568 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: horario_aula_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.horario_aula_id_seq', 96, true);
+
+
+--
+-- TOC entry 3569 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: instituicao_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.instituicao_id_seq', 1, false);
+
+
+--
+-- TOC entry 3570 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: local_equipamento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.local_equipamento_id_seq', 17, true);
+
+
+--
+-- TOC entry 3571 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: local_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.local_id_seq', 6, true);
+
+
+--
+-- TOC entry 3572 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: periodo_academico_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.periodo_academico_id_seq', 1, true);
+
+
+--
+-- TOC entry 3573 (class 0 OID 0)
+-- Dependencies: 248
+-- Name: pessoa_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pessoa_id_seq', 1, false);
+
+
+--
+-- TOC entry 3574 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: professor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.professor_id_seq', 6, true);
+
+
+--
+-- TOC entry 3575 (class 0 OID 0)
+-- Dependencies: 250
+-- Name: projeto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.projeto_id_seq', 1, false);
+
+
+--
+-- TOC entry 3576 (class 0 OID 0)
+-- Dependencies: 252
+-- Name: tipo_acao_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tipo_acao_id_seq', 1, false);
+
+
+--
+-- TOC entry 3577 (class 0 OID 0)
+-- Dependencies: 240
+-- Name: turma_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.turma_id_seq', 1, true);
+
+
+--
+-- TOC entry 3321 (class 2606 OID 21323)
+-- Name: acao acao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.acao
+    ADD CONSTRAINT acao_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3293 (class 2606 OID 21135)
+-- Name: aluno aluno_matricula_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aluno
+    ADD CONSTRAINT aluno_matricula_key UNIQUE (matricula);
+
+
+--
+-- TOC entry 3295 (class 2606 OID 21133)
+-- Name: aluno aluno_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aluno
+    ADD CONSTRAINT aluno_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3297 (class 2606 OID 21142)
+-- Name: aula aula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT aula_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3299 (class 2606 OID 21155)
+-- Name: coordenadoria coordenadoria_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.coordenadoria
+    ADD CONSTRAINT coordenadoria_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3301 (class 2606 OID 21162)
+-- Name: curso curso_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.curso
+    ADD CONSTRAINT curso_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3303 (class 2606 OID 21171)
+-- Name: disciplina disciplina_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.disciplina
+    ADD CONSTRAINT disciplina_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3305 (class 2606 OID 21178)
+-- Name: equipamento equipamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.equipamento
+    ADD CONSTRAINT equipamento_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3307 (class 2606 OID 21185)
+-- Name: evento evento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.evento
+    ADD CONSTRAINT evento_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3323 (class 2606 OID 21330)
+-- Name: funcao funcao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.funcao
+    ADD CONSTRAINT funcao_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3309 (class 2606 OID 21192)
+-- Name: horario_aula horario_aula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.horario_aula
+    ADD CONSTRAINT horario_aula_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3325 (class 2606 OID 21339)
+-- Name: instituicao instituicao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.instituicao
+    ADD CONSTRAINT instituicao_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3313 (class 2606 OID 21206)
+-- Name: local_equipamento local_equipamento_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local_equipamento
+    ADD CONSTRAINT local_equipamento_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3311 (class 2606 OID 21199)
+-- Name: local local_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local
+    ADD CONSTRAINT local_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3315 (class 2606 OID 21217)
+-- Name: periodo_academico periodo_academico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.periodo_academico
+    ADD CONSTRAINT periodo_academico_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3327 (class 2606 OID 21348)
+-- Name: pessoa pessoa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pessoa
+    ADD CONSTRAINT pessoa_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3317 (class 2606 OID 21226)
+-- Name: professor professor_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.professor
+    ADD CONSTRAINT professor_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3329 (class 2606 OID 21355)
+-- Name: projeto projeto_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.projeto
+    ADD CONSTRAINT projeto_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3331 (class 2606 OID 21362)
+-- Name: tipo_acao tipo_acao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tipo_acao
+    ADD CONSTRAINT tipo_acao_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3319 (class 2606 OID 21233)
+-- Name: turma turma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.turma
+    ADD CONSTRAINT turma_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3348 (class 2606 OID 21368)
+-- Name: acao fk1s25iusvo60bsc6dbnihttkyo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.acao
+    ADD CONSTRAINT fk1s25iusvo60bsc6dbnihttkyo FOREIGN KEY (projeto_id) REFERENCES public.projeto(id);
+
+
+--
+-- TOC entry 3334 (class 2606 OID 21244)
+-- Name: aula fk21ymvtyrbs7epotql5wjpkhfm; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT fk21ymvtyrbs7epotql5wjpkhfm FOREIGN KEY (disciplina_id) REFERENCES public.disciplina(id);
+
+
+--
+-- TOC entry 3345 (class 2606 OID 21304)
+-- Name: local_equipamento fk84kyjqnf0f0rslaljmh5iyv2x; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local_equipamento
+    ADD CONSTRAINT fk84kyjqnf0f0rslaljmh5iyv2x FOREIGN KEY (local_id) REFERENCES public.local(id);
+
+
+--
+-- TOC entry 3341 (class 2606 OID 21284)
+-- Name: aula_horario fk933inwqwupcodrdtyxl5pa9hj; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula_horario
+    ADD CONSTRAINT fk933inwqwupcodrdtyxl5pa9hj FOREIGN KEY (aula_id) REFERENCES public.aula(id);
+
+
+--
+-- TOC entry 3335 (class 2606 OID 21259)
+-- Name: aula fk9dvd4nr6beh0lp2vp3v82xfn4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT fk9dvd4nr6beh0lp2vp3v82xfn4 FOREIGN KEY (professor_id) REFERENCES public.professor(id);
+
+
+--
+-- TOC entry 3332 (class 2606 OID 21234)
+-- Name: aluno fk9o09o8qj4x9uf9okvf622jyec; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aluno
+    ADD CONSTRAINT fk9o09o8qj4x9uf9okvf622jyec FOREIGN KEY (curso_id) REFERENCES public.curso(id);
+
+
+--
+-- TOC entry 3342 (class 2606 OID 21279)
+-- Name: aula_horario fk9rkax0r3yakq17k2xnfbxwtc3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula_horario
+    ADD CONSTRAINT fk9rkax0r3yakq17k2xnfbxwtc3 FOREIGN KEY (horario_id) REFERENCES public.horario_aula(id);
+
+
+--
+-- TOC entry 3333 (class 2606 OID 21239)
+-- Name: aluno fkehtgr8rih20h4gomh4dd4sbxu; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aluno
+    ADD CONSTRAINT fkehtgr8rih20h4gomh4dd4sbxu FOREIGN KEY (turma_id) REFERENCES public.turma(id);
+
+
+--
+-- TOC entry 3336 (class 2606 OID 21254)
+-- Name: aula fkhi0x3urb19d0o1j9st2cdkp01; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT fkhi0x3urb19d0o1j9st2cdkp01 FOREIGN KEY (periodo_academico_id) REFERENCES public.periodo_academico(id);
+
+
+--
+-- TOC entry 3346 (class 2606 OID 21299)
+-- Name: local_equipamento fkjae5bgc8b30ebob6ku94aakc0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.local_equipamento
+    ADD CONSTRAINT fkjae5bgc8b30ebob6ku94aakc0 FOREIGN KEY (equipamento_id) REFERENCES public.equipamento(id);
+
+
+--
+-- TOC entry 3343 (class 2606 OID 21289)
+-- Name: curso fkjo0mcmwgirdnfxcwq2y6fy11h; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.curso
+    ADD CONSTRAINT fkjo0mcmwgirdnfxcwq2y6fy11h FOREIGN KEY (coordenadoria_id) REFERENCES public.coordenadoria(id);
+
+
+--
+-- TOC entry 3337 (class 2606 OID 21264)
+-- Name: aula fkjvf4kup1uubq8y4hldrijp2ro; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT fkjvf4kup1uubq8y4hldrijp2ro FOREIGN KEY (turma_id) REFERENCES public.turma(id);
+
+
+--
+-- TOC entry 3351 (class 2606 OID 21378)
+-- Name: pessoa fkjynvqf3spd011hxkxbus4hbkq; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pessoa
+    ADD CONSTRAINT fkjynvqf3spd011hxkxbus4hbkq FOREIGN KEY (funcao_id) REFERENCES public.funcao(id);
+
+
+--
+-- TOC entry 3344 (class 2606 OID 21294)
+-- Name: disciplina fkkhdiw1swjoa2ml3md0mt8g4sf; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.disciplina
+    ADD CONSTRAINT fkkhdiw1swjoa2ml3md0mt8g4sf FOREIGN KEY (curso_id) REFERENCES public.curso(id);
+
+
+--
+-- TOC entry 3349 (class 2606 OID 21373)
+-- Name: acao fklpdk4fmofe286obfv74q1gw7h; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.acao
+    ADD CONSTRAINT fklpdk4fmofe286obfv74q1gw7h FOREIGN KEY (tipo_acao_id) REFERENCES public.tipo_acao(id);
+
+
+--
+-- TOC entry 3339 (class 2606 OID 21269)
+-- Name: aula_aluno fkoy8ca3f46mwymko7f3rg3ptgd; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula_aluno
+    ADD CONSTRAINT fkoy8ca3f46mwymko7f3rg3ptgd FOREIGN KEY (aluno_id) REFERENCES public.aluno(id);
+
+
+--
+-- TOC entry 3352 (class 2606 OID 21383)
+-- Name: pessoa fkpwf3btd9r309wlalsosfsqdwi; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pessoa
+    ADD CONSTRAINT fkpwf3btd9r309wlalsosfsqdwi FOREIGN KEY (instituicao_id) REFERENCES public.instituicao(id);
+
+
+--
+-- TOC entry 3347 (class 2606 OID 21309)
+-- Name: professor fkqpr2kvkjchf8oj9c20700nm6d; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.professor
+    ADD CONSTRAINT fkqpr2kvkjchf8oj9c20700nm6d FOREIGN KEY (coordenadoria_id) REFERENCES public.coordenadoria(id);
+
+
+--
+-- TOC entry 3338 (class 2606 OID 21249)
+-- Name: aula fkr4pq5oq3x8i072h0m8pppbspv; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula
+    ADD CONSTRAINT fkr4pq5oq3x8i072h0m8pppbspv FOREIGN KEY (local_id) REFERENCES public.local(id);
+
+
+--
+-- TOC entry 3340 (class 2606 OID 21274)
+-- Name: aula_aluno fkrh0oc6gpvc4rdue6afhqwuhy2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.aula_aluno
+    ADD CONSTRAINT fkrh0oc6gpvc4rdue6afhqwuhy2 FOREIGN KEY (aula_id) REFERENCES public.aula(id);
+
+
+--
+-- TOC entry 3350 (class 2606 OID 21363)
+-- Name: acao fks5yt0f6c91jyon0vgref764mc; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.acao
+    ADD CONSTRAINT fks5yt0f6c91jyon0vgref764mc FOREIGN KEY (instituicao_id) REFERENCES public.instituicao(id);
+
+
+-- Completed on 2024-04-22 19:21:21
+
+--
+-- PostgreSQL database dump complete
+--
+
