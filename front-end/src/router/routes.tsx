@@ -20,6 +20,7 @@ import Disciplinas from "../views/Cadastros/Disciplina";
 import Turmas from "../views/Cadastros/Turma";
 import HorariosAula from "../views/Cadastros/HorariosAula";
 import ProximaAula from  "../views/Consultas/ProximaAula";
+import CoordenadoresTurno from "../views/Cadastros/CoordenadoresTurno";
 
 export interface RouteConfig {
   path: string;
@@ -62,9 +63,11 @@ const routes: RouteConfig[] = [
       { path: "Cadastros/Professores", element: <Professores />, permissions: "" },
       //Cursos
       { path: "Cadastros/Cursos", element: <Cursos />, permissions: "" },
-
+      //Turmas
       { path: "Cadastros/Turmas", element: <Turmas />, permissions: "" },
-
+        //Turmas
+      { path: "Cadastros/Coordenadores de Turno", element: <CoordenadoresTurno />, permissions: "" },
+      
       //Alunos
       { path: "Cadastros/Alunos", element: <Alunos />, permissions: "" },
       

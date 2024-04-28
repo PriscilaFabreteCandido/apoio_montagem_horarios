@@ -27,9 +27,11 @@ import {
   SafetyCertificateOutlined,
   SearchOutlined,
   SettingOutlined,
+  ShopOutlined,
   SolutionOutlined,
   TeamOutlined,
   UserAddOutlined,
+  UserSwitchOutlined,
   UsergroupAddOutlined,
   VideoCameraOutlined,
   WarningOutlined,
@@ -70,29 +72,65 @@ function getItem(
 
 const items: MenuProps["items"] = [
   getItem("Início", "inicio", <HomeOutlined />, "/Inicio"),
-  getItem("Cadastros", "cadastros", <CheckCircleOutlined />, "/Cadastros", 
-  [
+  getItem("Cadastros", "cadastros", <CheckCircleOutlined />, "/Cadastros", [
     getItem("Alunos", "alunos", <TeamOutlined />, "/Cadastros/Alunos"),
     getItem("Aulas", "aulas", <ClockCircleOutlined />, "/Cadastros/Aulas"),
     getItem("Turmas", "turmas", <FundViewOutlined />, "/Cadastros/Turmas"),
     getItem("Cursos", "cursos", <FundViewOutlined />, "/Cadastros/Cursos"),
-    getItem("Disciplinas", "disciplinas", <BookOutlined />, "/Cadastros/Disciplinas"),
-    getItem("Coordenadoria", "coordenadoria", <ApartmentOutlined   />, "/Cadastros/Coordenadorias"),
-    getItem("Equipamentos", "equipamento", <LaptopOutlined    />, "/Cadastros/Equipamentos"),
-    getItem("Locais", "Locais", <UsergroupAddOutlined />, "/Cadastros/Locais"),
-    getItem("Professores", "professores", <ContactsOutlined    />, "/Cadastros/Professores"),
-    getItem("Horários de Aula", "Horarios", <ContactsOutlined    />, "/Cadastros/Horarios"),
-    getItem("Semestre Letivos", "semestreLetivo", <HourglassOutlined   />, "/Cadastros/Semestres Letivos"),
-    
-    
-  ],
-  ),
+    getItem(
+      "Disciplinas",
+      "disciplinas",
+      <BookOutlined />,
+      "/Cadastros/Disciplinas"
+    ),
+    getItem(
+      "Coordenadoria",
+      "coordenadoria",
+      <ApartmentOutlined />,
+      "/Cadastros/Coordenadorias"
+    ),
+    getItem(
+      "Coordenadores de Turno",
+      "coordenadoriaTurno",
+      <UserSwitchOutlined />,
+      "/Cadastros/Coordenadores de Turno"
+    ),
+    getItem(
+      "Equipamentos",
+      "equipamento",
+      <LaptopOutlined />,
+      "/Cadastros/Equipamentos"
+    ),
+    getItem("Locais", "Locais", <ShopOutlined />, "/Cadastros/Locais"),
+    getItem(
+      "Professores",
+      "professores",
+      <ContactsOutlined />,
+      "/Cadastros/Professores"
+    ),
+    getItem(
+      "Horários de Aula",
+      "Horarios",
+      <ClockCircleOutlined />,
+      "/Cadastros/Horarios"
+    ),
+    getItem(
+      "Semestre Letivos",
+      "semestreLetivo",
+      <HourglassOutlined />,
+      "/Cadastros/Semestres Letivos"
+    ),
+  ]),
   getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas"),
-  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR",
-  [
+  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR", [
     getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
-    getItem("Próxima aula", "Proxima Aula", <CalendarOutlined   />, "/Consultas/Proxima Aula"),
-  ],),
+    getItem(
+      "Próxima aula",
+      "Proxima Aula",
+      <CalendarOutlined />,
+      "/Consultas/Proxima Aula"
+    ),
+  ]),
 ];
 
 function MenuLeft({ isIconClicked }: any) {
@@ -102,38 +140,38 @@ function MenuLeft({ isIconClicked }: any) {
 
   useEffect(() => {
     const currentPath = location.pathname;
-  
+
     const selectedItem = items?.find((item: any) =>
       currentPath.startsWith(item.uri || "")
     );
-  
+
     if (selectedItem) {
       setDefaultSelectedKeys([selectedItem?.key?.toString()]);
     } else {
       setDefaultSelectedKeys([""]);
     }
   }, [location.pathname, navigate]);
-  
+
   function encontrarItemDoMenu(items: any[], targetKey: React.Key): void {
     var selectedItem: any = null;
     if (!items || items.length <= 0) return;
-  
+
     for (const item of items) {
       if (item.key === targetKey) {
         selectedItem = item;
         return selectedItem;
       }
-  
+
       if (item.children && item.children.length > 0) {
         selectedItem = encontrarItemDoMenu(item.children, targetKey);
-        if(selectedItem) return selectedItem;
+        if (selectedItem) return selectedItem;
       }
     }
   }
-  
+
   const onClick: MenuProps["onClick"] = (e: any) => {
     //e.preventDefault();
-    var selectedItem: any = encontrarItemDoMenu(items ?  items : [], e.key);
+    var selectedItem: any = encontrarItemDoMenu(items ? items : [], e.key);
     if (selectedItem && selectedItem.uri) {
       navigate(selectedItem.uri);
     }
@@ -144,20 +182,20 @@ function MenuLeft({ isIconClicked }: any) {
       <div
         style={{
           width: "100%",
-          padding: isIconClicked ? '0rem 1rem' : '1rem 0rem 0rem 0rem',
-          height: isIconClicked ? "4rem" : "3rem",
+          padding: "1rem",
+          height: "60px",
+          display: "flex", 
+          justifyContent: "center",
+          alignItems: "center",
           borderInlineEnd: "1px solid rgba(5, 5, 5, 0.06)",
         }}
         className="logo"
       >
-        
-  <img
-      src={isIconClicked ? transferir : logo}
-      alt="Descrição da imagem"
-      style={{ width: "100%", height: "auto", marginTop: "10px" }}
-  />
-
-
+        <img
+          src={isIconClicked ? transferir : logo}
+          alt="Descrição da imagem"
+          style={{ width: "100%", height: "auto", }}
+        />
       </div>
 
       {defaultSelectedKeys && defaultSelectedKeys.length > 0 && (
@@ -166,6 +204,7 @@ function MenuLeft({ isIconClicked }: any) {
             height: "calc(100% - 6rem)",
             overflow: "auto",
             width: "100%",
+            
           }}
         >
           <Menu
@@ -176,8 +215,7 @@ function MenuLeft({ isIconClicked }: any) {
             mode="inline"
             inlineCollapsed={!isIconClicked}
             items={items}
-          >
-          </Menu>
+          ></Menu>
         </div>
       )}
     </>

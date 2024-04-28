@@ -9,6 +9,9 @@
   --colorDanger: #DC2626;
 }
 
+:where(.css-dev-only-do-not-override-19aanzt).ant-btn-primary{
+  box-shadow: none;
+}
 .ifes-btn-primary {
   background-color: var(--colorPrimary) !important;
   color: white;

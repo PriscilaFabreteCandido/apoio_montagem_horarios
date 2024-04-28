@@ -138,11 +138,10 @@ function Header({ onIconClick }: any) {
           />
           
           <div className="cor-white info-user flex flex-column btn-info-user">
-            <h6 className="font-14" style={{ margin: "0" }}>
+            <h6 className="font-14" style={{ marginTop: "15px" }}>
               Administrador
             </h6>
-            <span style={{ fontSize: "11px" }}>Empresa</span>
-            <span style={{ fontSize: "11px" }}>Contrato</span>
+           
           </div>
 
           {/* Botão de Ação Adicional (se aplicável) */}
