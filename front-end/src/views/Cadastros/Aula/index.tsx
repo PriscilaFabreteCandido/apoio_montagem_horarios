@@ -17,6 +17,7 @@ import {
   EditOutlined,
   PlusOutlined,
   UnorderedListOutlined,
+  ClockCircleOutlined, // Adicionando o ícone para os horários
 } from "@ant-design/icons";
 import { CardFooter } from "../../../components/CardFooter";
 import { ColumnsType } from "antd/es/table";
@@ -67,7 +68,7 @@ const Aulas: React.FC = () => {
   const [professores, setProfessores] = useState<any[]>([]);
   const [periodosAcademicos, setPeriodosAcademicos] = useState<any[]>([]);
   const [disciplinas, setDisciplinas] = useState<any[]>([]);
-  const [turmas, setTurmas] = useState<any[]>([]); // Adicionado estado para turmas
+  const [turmas, setTurmas] = useState<any[]>([]);
   const [horarios, setHorarios] = useState<any[]>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
@@ -151,7 +152,7 @@ const Aulas: React.FC = () => {
 
   const getTurmas = async () => {
     try {
-      const response = await get("turmas"); // Adicionar endpoint correto
+      const response = await get("turmas");
       setTurmas(response);
     } catch (error) {
       console.error("Erro ao obter turmas:", error);
@@ -166,9 +167,9 @@ const Aulas: React.FC = () => {
     getDisciplinas();
     getAlunos();
     getHorarios();
-    getTurmas(); // Chamar a função para obter as turmas
+    getTurmas();
   }, []);
-  
+
   const showError = (errorMessage: string) => {
     message.error(errorMessage);
   };
@@ -191,7 +192,7 @@ const Aulas: React.FC = () => {
         disciplina: disciplinas.find(
           (disciplina) => disciplina.id === values.disciplinaId
         ),
-        turma: turmas.find((turma) => turma.id === values.turmaId), // Passando o objeto completo da turma
+        turma: turmas.find((turma) => turma.id === values.turmaId),
         alunos: values.alunos.map((id: number) =>
           alunos.find((aluno) => aluno.id === id)
         ),
@@ -200,7 +201,7 @@ const Aulas: React.FC = () => {
         ),
       };
 
-      console.log("Dados enviados para o backend:", aulaData); // Adicionando console.log com os dados
+      console.log("Dados enviados para o backend:", aulaData);
 
       if (!aulaToEdit) {
         const response = await post("aulas/create", aulaData);
@@ -256,6 +257,31 @@ const Aulas: React.FC = () => {
     }
   };
 
+  const viewHorarios = (horarios: any[] | null) => {
+    if (!horarios || horarios.length === 0) {
+      Modal.info({
+        title: "Horários da Aula",
+        content: "Nenhum horário definido para esta aula.",
+        onOk() {},
+      });
+    } else {
+      Modal.info({
+        title: "Horários da Aula",
+        content: (
+          <ul>
+            {horarios.map((horario) => (
+              <li key={horario.id}>
+                {moment(horario.horaInicio, "HH:mm:ss").format("HH:mm")} -{" "}
+                {moment(horario.horaFim, "HH:mm:ss").format("HH:mm")}
+              </li>
+            ))}
+          </ul>
+        ),
+        onOk() {},
+      });
+    }
+  };
+
   const renderAlunos = (alunosIds: number[] | null) => {
     if (!alunosIds || alunosIds.length === 0) {
       return "";
@@ -278,16 +304,14 @@ const Aulas: React.FC = () => {
       dataIndex: "horarios",
       key: "horarios",
       render: (horarios: any[]) => (
-        <ul>
-          {horarios &&
-            horarios.length > 0 &&
-            horarios.map((horario: any) => (
-              <li key={horario.id}>
-                {moment(horario.horaInicio, "HH:mm:ss").format("HH:mm")} -{" "}
-                {moment(horario.horaFim, "HH:mm:ss").format("HH:mm")}
-              </li>
-            ))}
-        </ul>
+        <Tooltip title="Visualizar Horários">
+          <Button
+            type="link"
+            icon={<ClockCircleOutlined />}
+            onClick={() => viewHorarios(horarios)}
+          >
+          </Button>
+        </Tooltip>
       ),
     },
     {
@@ -318,7 +342,7 @@ const Aulas: React.FC = () => {
       },
     },
     {
-      title: "Turma", // Adicionar coluna de turma
+      title: "Turma",
       dataIndex: "turma",
       key: "turma",
       render: (turma: { id: number; nome: string }) => {
@@ -376,7 +400,7 @@ const Aulas: React.FC = () => {
                   professorId: record.professor.id,
                   periodoAcademicoId: record.periodoAcademico.id,
                   disciplinaId: record.disciplina.id,
-                  turmaId: record.turma.id, // Adicionar campo de turma
+                  turmaId: record.turma.id,
                   alunos: record.alunos.map((aluno: any) => aluno.id),
                   horarios: record.horarios.map((horario: any) => horario.id),
                 });

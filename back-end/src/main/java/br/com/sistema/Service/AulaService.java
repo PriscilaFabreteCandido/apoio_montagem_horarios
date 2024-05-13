@@ -14,6 +14,9 @@ import br.com.sistema.Repository.PeriodoAcademicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -121,6 +124,45 @@ public class AulaService {
             }
         }
     }
+
+    private String converterParaPortugues(String dayOfWeek) {
+        switch (dayOfWeek) {
+            case "MONDAY":
+                return "SEGUNDA-FEIRA";
+            case "TUESDAY":
+                return "TERÇA-FEIRA";
+            case "WEDNESDAY":
+                return "QUARTA-FEIRA";
+            case "THURSDAY":
+                return "QUINTA-FEIRA";
+            case "FRIDAY":
+                return "SEXTA-FEIRA";
+            case "SATURDAY":
+                return "SÁBADO";
+            case "SUNDAY":
+                return "DOMINGO";
+            default:
+                throw new IllegalArgumentException("Dia da semana inválido: " + dayOfWeek);
+        }
+    }
+
+    public AulaDTO findProximaAulaByMatricula(String matricula) {
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek currentDay = now.getDayOfWeek();
+        String currentDayString = converterParaPortugues(currentDay.toString());
+
+        Date currentTime = java.sql.Timestamp.valueOf(now);
+
+        List<Aula> aulas = repository.findProximaAulaByMatriculaAndDayOfWeek(matricula, currentDayString, currentTime);
+        if (aulas.isEmpty()) {
+            throw new EntityNotFoundException("Não há aulas futuras para o aluno com matrícula '" + matricula + "'.");
+        }
+
+        Aula proximaAula = aulas.get(0);
+        return mapper.toDto(proximaAula);
+    }
+
+
 
 
 }

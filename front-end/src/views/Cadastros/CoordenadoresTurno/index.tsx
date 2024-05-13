@@ -42,7 +42,7 @@ const CoordenadoresTurno: React.FC = () => {
   const getCoordenadorias = async () => {
     setLoading(true);
     try {
-      const response: CoordenadoresType[] = await get("coordenadorias");
+      const response: CoordenadoresType[] = await get("coordenadoresTurno");
       setCoordenadorias(response);
     } catch (error) {
       console.error("Erro ao obter coordenadorias:", error);

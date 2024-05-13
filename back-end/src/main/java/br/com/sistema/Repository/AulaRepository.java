@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,21 @@ public interface AulaRepository extends JpaRepository<Aula, Long> {
     List<Aula> findConflitingAulasByProfessor(@Param("diaSemana") String diaSemana,
                                               @Param("horarios") List<HorarioAula> horarios,
                                               @Param("professorId") Long professorId);
+
+
+    @Query("SELECT a FROM Aula a " +
+            "JOIN FETCH a.horarios h " +
+            "LEFT JOIN a.alunos al " +
+            "LEFT JOIN a.professor pf " +
+            "WHERE (al.matricula = :matricula OR pf.matricula = :matricula) " +
+            "AND a.diaSemana = :diaSemana " +
+            "AND (h.horaInicio > :currentTime OR (h.horaInicio = :currentTime AND h.horaFim > :currentTime)) " +
+            "ORDER BY h.horaInicio")
+    List<Aula> findProximaAulaByMatriculaAndDayOfWeek(@Param("matricula") String matricula,
+                                                      @Param("diaSemana") String diaSemana,
+                                                      @Param("currentTime") Date currentTime);
+
+
 
 
 }

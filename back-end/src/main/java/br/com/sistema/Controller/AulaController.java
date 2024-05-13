@@ -23,6 +23,12 @@ public class AulaController {
 
     private final AulaService aulaService;
 
+    @GetMapping("/proxima/{matricula}")
+    public ResponseEntity<AulaDTO> findProximaAulaByMatricula(@PathVariable String matricula) {
+        AulaDTO proximaAula = aulaService.findProximaAulaByMatricula(matricula);
+        return new ResponseEntity<>(proximaAula, HttpStatus.OK);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<AulaDTO> createAula(@RequestBody AulaDTO aulaDTO) {
         System.out.println(aulaDTO);
