@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+    <Appenders>
+        <Console name="LogToConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSSS} [%thread] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <File name="LogToFile" fileName="logs/main-logs.log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+        <File name="specific-logs" fileName="logs/specific-logs.log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="LogToFile"/>
+            <AppenderRef ref="LogToConsole"/>
+        </Root>
+
+        <!-- Controllers -->
+
+        <!-- Services -->
+        <Logger name="sistema.Service.AlunoService" additivity="false">
+            <AppenderRef ref="specific-logs"/>
+        </Logger>
+
+    </Loggers>
+</Configuration>

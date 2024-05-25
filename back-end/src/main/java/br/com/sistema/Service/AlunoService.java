@@ -13,17 +13,20 @@ import br.com.sistema.Repository.AlunoRepository;
 import br.com.sistema.Repository.CursoRepository;
 import br.com.sistema.Repository.ProfessorRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AlunoService {
 
     private final AlunoRepository repository;
     private final AlunoMapper mapper;
 
+    private final String prefixLog = "[ALUNO]";
     private final CursoRepository cursoRepository;
     private final ProfessorRepository professorRepository;
 
@@ -51,6 +54,8 @@ public class AlunoService {
             cursoRepository.save(curso);
         }
 
+        log.info(prefixLog + " Aluno cadastrado com sucesso. Aluno: " + entity.getNome() + " (" + entity.getMatricula() + ")");
+
         return mapper.toDto(entity);
     }
 
@@ -76,6 +81,8 @@ public class AlunoService {
             cursoRepository.save(curso);
         }
 
+        log.info(prefixLog + " Aluno alterado com sucesso. Aluno: " + entity.getMatricula());
+
         return mapper.toDto(entity);
 
     }
@@ -85,6 +92,8 @@ public class AlunoService {
                 .orElseThrow(() -> new EntityNotFoundException("Aluno com ID '" + id + "' não encontrado."));
 
         repository.delete(aluno);
+
+        log.info(prefixLog + " Aluno deletado com sucesso. Aluno: " + aluno.getMatricula());
     }
 
     //=============================================================================================
