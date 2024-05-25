@@ -124,6 +124,7 @@ const items: MenuProps["items"] = [
   getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas"),
   getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR", [
     getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
+    getItem("Logs", "logs", <BarChartOutlined />, "/Alocações/logs"),
     getItem(
       "Próxima aula",
       "Proxima Aula",
@@ -184,7 +185,7 @@ function MenuLeft({ isIconClicked }: any) {
           width: "100%",
           padding: "1rem",
           height: "60px",
-          display: "flex", 
+          display: "flex",
           justifyContent: "center",
           alignItems: "center",
           borderInlineEnd: "1px solid rgba(5, 5, 5, 0.06)",
@@ -204,7 +205,7 @@ function MenuLeft({ isIconClicked }: any) {
             height: "calc(100% - 6rem)",
             overflow: "auto",
             width: "100%",
-            
+
           }}
         >
           <Menu

@@ -21,6 +21,7 @@ import Turmas from "../views/Cadastros/Turma";
 import HorariosAula from "../views/Cadastros/HorariosAula";
 import ProximaAula from  "../views/Consultas/ProximaAula";
 import CoordenadoresTurno from "../views/Cadastros/CoordenadoresTurno";
+import Logs from  "../views/Consultas/Logs";
 
 export interface RouteConfig {
   path: string;
@@ -81,6 +82,7 @@ const routes: RouteConfig[] = [
       { path: "Consultas/Proxima Aula", element: <ProximaAula />, permissions: "" },
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
+      { path: "Alocações/Logs", element: <Logs />, permissions: "" },
       // {
       //   path: "*",
       //   permissions: "",

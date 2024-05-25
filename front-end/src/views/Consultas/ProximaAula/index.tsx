@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Select, Input, Button } from "antd";
+import { Select, Input, Button, Modal} from "antd";
 import { get } from "../../../api/axios";
 import { message } from "antd/lib";
+import JsBarcode from "jsbarcode";
 
 const { Option } = Select;
 
@@ -50,6 +51,13 @@ const HorarioTable = () => {
   const [aluno, setAluno] = useState<Aluno | null>(null);
   const [professor, setProfessor] = useState<Professor | null>(null);
   const [aulas, setAulas] = useState<Aula[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  
+
+  useEffect(() => {
+    setPeriodosAcademicos();
+  }, []);
 
   const setPeriodosAcademicos = async () => {
     try {
@@ -59,10 +67,6 @@ const HorarioTable = () => {
       console.error("Erro ao obter períodos acadêmicos:", error);
     }
   };
-
-  useEffect(() => {
-    setPeriodosAcademicos();
-  }, []);
 
   const handlePeriodoChange = (value: number) => {
     const periodo = periodosLetivos.find((periodo) => periodo.id === value);
@@ -89,6 +93,18 @@ const HorarioTable = () => {
     }
   };
 
+  const handleImprimirMatriculaClick = () => {
+    setIsModalVisible(true); // Mostrar o modal ao clicar no botão
+  };
+
+  const handleModalOk = () => {
+    setIsModalVisible(false); // Fechar o modal
+    handleImprimirEtiquetasClick();
+    console.log(`Quantidade de etiquetas: ${selectedQuantity}`);
+    // Adicione aqui o código para realizar a ação de impressão com a quantidade de etiquetas selecionada
+  };
+
+
   const handleVerProximaAulaClick = async () => {
     // Verificar se o período acadêmico foi selecionado
     if (!periodoSelecionado) {
@@ -108,6 +124,7 @@ const HorarioTable = () => {
       console.log("Dados do professor:", professorResponse);
       setProfessor(professorResponse);
       renderizarTabelaProfessor(); // Chamada para renderizar a tabela do professor
+      generateBarcode(matricula);
       carregarTabela();
       return;
     } catch (error) {
@@ -120,6 +137,7 @@ const HorarioTable = () => {
       console.log("Dados do aluno:", alunoResponse);
       setAluno(alunoResponse);
       renderizarTabelaAluno(); // Chamada para renderizar a tabela do aluno
+      generateBarcode(matricula);
       carregarTabela();
       return;
     } catch (error) {
@@ -137,6 +155,7 @@ const HorarioTable = () => {
     setAulas([]);
     setAluno(null);
     setProfessor(null);
+    setMatricula(''); 
   };
 
   const renderPeriodoAcademico = (periodoAcademico: PeriodoAcademico) => {
@@ -177,6 +196,15 @@ const HorarioTable = () => {
     return descricao; // Retorna a descrição original se não for possível abreviar
   };
 
+  const handleQuantityChange = (value: number) => {
+    setSelectedQuantity(value); // Atualizar a quantidade selecionada
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false); // Fechar o modal
+  };
+
+  
   const renderizarTabela = () => {
     // Array para armazenar as células da tabela
     const tabela: JSX.Element[] = [];
@@ -302,6 +330,99 @@ const HorarioTable = () => {
     return null;
   };
 
+  const generateBarcode = (matricula: string) => {
+    const canvas = document.getElementById("barcode") as HTMLCanvasElement | null;
+    if (canvas) {
+      JsBarcode(canvas, matricula, {
+        format: "CODE128",
+        displayValue: false,
+      });
+    }
+  };
+  
+  const handleImprimirEtiquetasClick = () => {
+    const matricula = aluno?.matricula || professor?.matricula;
+    if (!matricula) {
+      showError("Aluno ou professor não encontrado ou matrícula indefinida.");
+      return;
+    }
+  
+    const larguraEtiqueta = 38; // Largura individual da etiqueta em mm
+    const larguraTotal = 3 * larguraEtiqueta; // Largura total em mm
+  
+    const printWindow = window.open("", "_blank", `width=${larguraTotal}mm`);
+  
+    let etiquetasContent = `
+        <html>
+            <head>
+                <title>Etiquetas</title>
+                <style>
+                    @media print {
+                        @page {
+                            size: ${larguraTotal}mm 22mm;
+                            margin: 0;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            display: flex;
+                            justify-content: space-between;
+                            flex-wrap: nowrap;
+                        }
+                        .etiqueta {
+                          width: ${larguraEtiqueta}mm;
+                          height: 75px; /* Defina uma altura fixa para a etiqueta */
+                          box-sizing: border-box;
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          justify-content: center;
+                          text-align: center;
+                      }
+                      
+                        img {
+                            width: 95%;
+                            height: auto;
+                        }
+                        .matricula-text {
+                          font-size: 12px;
+                          font-weight: bold;
+                      }
+                      
+                    }
+                </style>
+            </head>
+            <body>
+    `;
+  
+    for (let i = 0; i < selectedQuantity; i++) {
+      const canvas = document.createElement("canvas");
+      JsBarcode(canvas, matricula, {
+        format: "CODE128",
+        displayValue: false,
+      });
+  
+      const imageData = canvas.toDataURL("image/png");
+  
+      etiquetasContent += `
+          <div class="etiqueta">
+              <img src="${imageData}" />
+              <div class="matricula-text">${matricula}</div>
+          </div>
+      `;
+    }
+  
+    etiquetasContent += `
+            </body>
+        </html>
+    `;
+  
+    printWindow?.document.write(etiquetasContent);
+    printWindow?.document.close();
+    printWindow?.print();
+  };
+  
+
   return (
     <div>
       <style>
@@ -365,6 +486,34 @@ const HorarioTable = () => {
         >
           Limpar
         </Button>
+      
+        {(aluno || professor) && (
+  <Button
+    type="primary"
+    onClick={handleImprimirMatriculaClick}
+    style={{ marginLeft: 10 }}
+  >
+    Imprimir matrícula
+  </Button>
+)}
+
+      <Modal
+        title="Selecione a quantidade de etiquetas"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      >
+        <Select
+          defaultValue={1}
+          style={{ width: 120 }}
+          onChange={handleQuantityChange}
+        >
+          <Option value={1}>1</Option>
+          <Option value={2}>2</Option>
+          <Option value={3}>3</Option>
+        </Select>
+      </Modal>
+
       </div>
       {aluno && renderizarTabelaAluno()}{" "}
       {/* Renderiza a tabela do aluno se houver dados de aluno */}
@@ -431,6 +580,7 @@ const HorarioTable = () => {
         </thead>
         <tbody>{renderizarTabela()}</tbody>
       </table>
+      <canvas id="barcode"></canvas>
     </div>
   );
 };
