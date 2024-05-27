@@ -5,9 +5,12 @@ import br.com.sistema.DTO.EquipamentoDTO;
 import br.com.sistema.Service.CoordenadoriaService;
 import br.com.sistema.Service.EquipamentoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +27,8 @@ public class CoordenadoriaController {
     @PostMapping("/create")
     public ResponseEntity<CoordenadoriaDTO> createCoordenadoria(@RequestBody CoordenadoriaDTO coordenadoriaDTO) {
         System.out.println(coordenadoriaDTO);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userLogin = authentication.getName();
         return new ResponseEntity<>(coordenadoriaService.create(coordenadoriaDTO), HttpStatus.OK);
     }
 

@@ -1,5 +1,6 @@
 import { Navigate } from "react-router";
 import Home from "../views/app/home";
+import Login from "../views/app/Login";
 import RootLayout from "../layout";
 
 import Logout from "../views/app/Logout";
@@ -38,7 +39,10 @@ const routes: RouteConfig[] = [
     element: <RootLayout />,
     permissions: "",
     children: [
-      // Inicio
+      //Login
+      { path: "Login", element: <Login />, permissions: "" },
+
+      //Inicio
       { path: "Inicio", element: <Home />, permissions: "" },
 
       //Cadastros
