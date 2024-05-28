@@ -18,6 +18,10 @@ public class Evento {
     @Temporal(TemporalType.DATE)
     private Date data;
 
+    @ManyToOne
+    @JoinColumn(name = "local_id")
+    private Local local;
+
     @Temporal(TemporalType.TIME)
     private Date horaInicio;
 

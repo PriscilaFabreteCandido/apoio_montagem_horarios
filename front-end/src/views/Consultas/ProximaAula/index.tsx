@@ -124,7 +124,7 @@ const HorarioTable = () => {
       console.log("Dados do professor:", professorResponse);
       setProfessor(professorResponse);
       renderizarTabelaProfessor(); // Chamada para renderizar a tabela do professor
-      generateBarcode(matricula);
+      //generateBarcode(matricula);
       carregarTabela();
       return;
     } catch (error) {
@@ -137,7 +137,7 @@ const HorarioTable = () => {
       console.log("Dados do aluno:", alunoResponse);
       setAluno(alunoResponse);
       renderizarTabelaAluno(); // Chamada para renderizar a tabela do aluno
-      generateBarcode(matricula);
+      //generateBarcode(matricula);
       carregarTabela();
       return;
     } catch (error) {

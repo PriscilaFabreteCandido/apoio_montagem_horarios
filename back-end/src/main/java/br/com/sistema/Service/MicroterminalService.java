@@ -1,50 +1,53 @@
 package br.com.sistema.Service;
 
-
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.json.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.util.Scanner;
-import javax.json.*;
 
 @Component
 public class MicroterminalService {
     private final int port = 1025;
-    private Socket socket = null;
     private ServerSocket serverSocket = null;
-    private BufferedInputStream bis = null;
-    private DataInputStream dis = null;
 
     public MicroterminalService() {
+        // Constructor is now empty
+    }
+
+    @PostConstruct
+    public void init() {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port " + serverSocket.getLocalPort() + "...");
             System.out.println("Waiting for client...");
         } catch (IOException e) {
-            System.out.println("Error: " + e);
+            System.out.println("Error initializing server socket: " + e.getMessage());
         }
     }
 
     public void start() {
+        if (serverSocket == null) {
+            System.out.println("Server socket is not initialized.");
+            return;
+        }
         try {
-            socket = serverSocket.accept();
+            Socket socket = serverSocket.accept();
             System.out.println("Client " + socket.getRemoteSocketAddress() + " connected to the server...");
 
-            bis = new BufferedInputStream(socket.getInputStream());
-            dis = new DataInputStream(bis);
+            try (BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+                 DataInputStream dis = new DataInputStream(bis);
+                 DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            while (true) {
-                try {
-                    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+                while (true) {
                     clearScreen(dos);
-
-                    dos.writeBytes("Digite a matricula :"  + "\r\n");
+                    dos.writeBytes("Digite a matricula :" + "\r\n");
 
                     StringBuilder userInput = new StringBuilder();
                     while (true) {
@@ -53,7 +56,6 @@ public class MicroterminalService {
                             break;
                         }
                         userInput.append((char) inputChar);
-
                         dos.writeByte(inputChar);
                     }
 
@@ -64,14 +66,13 @@ public class MicroterminalService {
                     while (in.read() != 13) {
                         // Wait until the user presses Enter
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                socket.close();
+                System.out.println("Client " + socket.getRemoteSocketAddress() + " disconnected from the server...");
             }
-            dis.close();
-            socket.close();
-            System.out.println("Client " + socket.getRemoteSocketAddress() + " disconnected from the server...");
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
@@ -97,8 +98,6 @@ public class MicroterminalService {
         }
     }
 
-
-
     private void displayAulaInfo(String response, DataOutputStream dos, String studentId) {
         if (response != null) {
             JsonReader reader = Json.createReader(new StringReader(response));
@@ -107,32 +106,26 @@ public class MicroterminalService {
             JsonObject local = aulaInfo.getJsonObject("local");
             String localDescription = local.getString("descricao");
 
-            // Pegando as quatro primeiras letras do primeiro nome do local
             String localFirstLetters = localDescription.split(" ")[0].substring(0, Math.min(4, localDescription.split(" ")[0].length()));
-            // Pegando o restante do nome do local
             String localRest = localDescription.replaceFirst(localFirstLetters, "").trim();
-
 
             JsonArray horarios = aulaInfo.getJsonArray("horarios");
             JsonObject firstHorario = horarios.getJsonObject(0);
             String horaInicio = firstHorario.getString("horaInicio");
 
             JsonArray alunos = aulaInfo.getJsonArray("alunos");
-            String firstName = ""; // Inicializa com uma string vazia
+            String firstName = "";
 
-            // Procura pelo aluno com a matrícula fornecida
             for (int i = 0; i < alunos.size(); i++) {
                 JsonObject aluno = alunos.getJsonObject(i);
                 String matricula = aluno.getString("matricula");
                 if (matricula.equals(studentId)) {
-                    // Se encontrar o aluno, atribui o nome à variável firstName e interrompe o loop
                     String alunoNome = aluno.getString("nome");
                     firstName = alunoNome.split(" ")[0];
                     break;
                 }
             }
 
-            // Obtém a sigla da disciplina
             JsonObject disciplina = aulaInfo.getJsonObject("disciplina");
             String siglaDisciplina = disciplina.getString("sigla");
 
@@ -157,7 +150,6 @@ public class MicroterminalService {
             System.out.println("Error: Unable to fetch class information.");
         }
     }
-
 
     private void clearScreen(DataOutputStream dos) throws IOException {
         dos.writeBytes("\033[H\033[2J");

@@ -1,6 +1,7 @@
 package br.com.sistema.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +14,8 @@ public class EventoDTO {
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT-3")
     private Date data;
+
+    private LocalDTO local;
 
     @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
     private Date horaInicio;
