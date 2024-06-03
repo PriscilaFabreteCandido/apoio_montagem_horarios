@@ -16,6 +16,7 @@ import {
 } from "antd";
 
 import { useState } from "react";
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../../../context/AuthService';
 import passaporteImg from "../../../assets/images/Ifes-Colatina.jpg";
 
 export default function Login() {
@@ -41,10 +42,15 @@ export default function Login() {
   
     try {
       const response = await post("/auth/login", userData);
-      const token = response.token;
-      localStorage.setItem("token", token);
-  
+      const { login, token, role } = response;
+      const userType = role == '[ROLE_ADMIN]' ? 'Administrador' : 'Convidado';
+      const user = new User({ login, token, userType });
+      localStorage.setItem("userLogado", JSON.stringify(user));
+
       navigate("/Inicio");
+
+      window.location.reload();
+      message.success("Login efetuado com sucesso!");
     } catch (error) {
       console.error('Erro ao realizar login:', error);
     }
@@ -55,10 +61,6 @@ export default function Login() {
       <div className="wrapper">
         <div className="formContainer">
           <form action="">
-            <div className="logoLogin">
-              <img src={logo} alt="" />
-            </div>
-
             <h1
               style={{
                 marginBottom: "10px",
@@ -67,15 +69,15 @@ export default function Login() {
                 paddingTop: '1rem'
               }}
             >
-              Controle de Acesso
+              Acessar sistema
             </h1>
             <Form form={loginForm} layout="vertical">
               <div className="input-box" style={{ marginTop: "0rem" }}>
                 <Form.Item
                   name="login"
-                  label="Siape"
+                  label="Login"
                   rules={[
-                    { required: true, message: "Por favor, insira o nome da coordenadoria!" },
+                    { required: true, message: "Por favor, insira um login válido." },
                   ]}
                 >
                   <Input />
@@ -94,15 +96,9 @@ export default function Login() {
                 </Form.Item>
               </div>
 
-              <label htmlFor="" className="label-remember">
+              <small className="label-remember">
                 Esqueceu sua senha?
-              </label>
-
-              <div className="remember-forgot">
-                <label htmlFor="">
-                  <input type="checkbox" /> Lembrar de mim?
-                </label>
-              </div>
+              </small>
 
               <button
                 type="submit"

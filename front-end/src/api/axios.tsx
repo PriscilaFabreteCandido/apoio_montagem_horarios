@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../context/AuthService';
 
 
 const BASE_URL = "http://localhost:8080/api/";
@@ -19,8 +19,8 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) { config.headers.Authorization = `Bearer ${token}`; }
+    const user = getLoggedInUser();
+    if (user) { config.headers.Authorization = `Bearer ${user.token}`; }
     return config;
   },
   (error) => {

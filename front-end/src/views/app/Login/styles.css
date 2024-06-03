@@ -9,7 +9,7 @@
 
 .formContainer {
   width: 400px;
-  height: 500px;
+  height: auto;
   padding: 0px 40px 30px 40px;
   border-bottom-left-radius: 10px;
 }

@@ -1,8 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./styles.css";
 import {
   BellOutlined,
   FormOutlined,
+  LoginOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -11,7 +12,8 @@ import {
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, FloatButton, Menu, MenuProps } from "antd";
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../../context/AuthService';
+import { Button, FloatButton, Menu, MenuProps, message } from "antd";
 import MenuItem from "antd/es/menu/MenuItem";
 import { useNavigate } from "react-router";
 
@@ -43,6 +45,7 @@ function getItem(
 }
 
 const itemsMenu: MenuProps["items"] = [
+  getItem("Entrar no sistema", "entrar", <LoginOutlined />, "/Login"),
   getItem("Sair da Aplicação", "sair", <LogoutOutlined />, "/Login"),
   getItem("Segurança", "seguranca", <SecurityScanOutlined />, "/Seguranca", [
     getItem(
@@ -63,6 +66,7 @@ const itemsMenu: MenuProps["items"] = [
 function Header({ onIconClick }: any) {
   const [collapsed, setCollapsed] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const menuRef = useRef<HTMLDivElement | null>({} as any);
   const navigate = useNavigate();
@@ -71,6 +75,19 @@ function Header({ onIconClick }: any) {
     setCollapsed(!collapsed);
     onIconClick(!collapsed);
   };
+
+  const updateUserType = () => {
+    const loggedInUser = getLoggedInUser();
+    if (loggedInUser) {
+      setUser(loggedInUser);
+    } else {
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    updateUserType();
+  }, []); 
 
   const handleMenuClick = (item: any) => {
     // Adicione aqui a lógica específica para lidar com cliques no menu, se necessário.
@@ -108,7 +125,27 @@ function Header({ onIconClick }: any) {
       e.key
     );
     if (selectedItem && selectedItem.uri) {
-      navigate(selectedItem.uri);
+      if (selectedItem.key == 'sair'){
+        const userJSON = localStorage.getItem("userLogado");
+
+        if (userJSON){
+          clearLoggedInUser();
+          navigate(selectedItem.uri);
+
+          window.location.reload();
+          message.success("Logout efetuado com sucesso!");
+        }
+      } else {
+        navigate(selectedItem.uri);
+      } 
+    }
+  };
+
+  const renderMenuItems = () => {
+    if (user) {
+      return itemsMenu!.filter(item => item!.key != 'entrar');
+    } else {
+      return itemsMenu!.filter(item => item!.key != 'sair');
     }
   };
 
@@ -132,6 +169,8 @@ function Header({ onIconClick }: any) {
 
         <div className="flex gap-1">
           {/* Informações do Usuário */}
+          {user && (
+          <> 
           <UserOutlined
             className="white-icon"
             style={{ fontSize: "1.25rem" }}
@@ -139,10 +178,14 @@ function Header({ onIconClick }: any) {
           
           <div className="cor-white info-user flex flex-column btn-info-user">
             <h6 className="font-14" style={{ marginTop: "15px" }}>
-              Administrador
+              { user?.login }
             </h6>
-           
+            <small>
+              { user?.userType }
+            </small>
           </div>
+          </>
+          )}
 
           {/* Botão de Ação Adicional (se aplicável) */}
             {/* Separador */}
@@ -170,7 +213,7 @@ function Header({ onIconClick }: any) {
           className="menu-content"
           defaultOpenKeys={["sub1"]}
           mode="inline"
-          items={itemsMenu}
+          items={renderMenuItems()}
         ></Menu>
       )}
     </>

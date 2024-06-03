@@ -41,6 +41,7 @@ import "./styles.css";
 import { Menu } from "antd";
 import transferir from "../../assets/images/ifes.png";
 import logo from "../../assets/images/logo2_menor.png";
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../../context/AuthService';
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface MenuItem {
@@ -121,16 +122,23 @@ const items: MenuProps["items"] = [
       "/Cadastros/Semestres Letivos"
     ),
   ]),
-  getItem("Consultas", "consultas", <FileTextOutlined />, "/Consultas"),
-  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR", [
-    getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
-    getItem("Logs", "logs", <BarChartOutlined />, "/Alocações/logs"),
+  getItem("Consultas abertas", "consultas", <FileTextOutlined />, "", [
+    getItem(
+      "Horário",
+      "horario",
+      <FileTextOutlined />,
+      "/Consultas"
+    ),
     getItem(
       "Próxima aula",
-      "Proxima Aula",
+      "proximaaula",
       <CalendarOutlined />,
       "/Consultas/Proxima Aula"
     ),
+  ]),
+  getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR", [
+    getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),
+    getItem("Logs", "logs", <BarChartOutlined />, "/Alocações/logs"),
   ]),
 ];
 
@@ -138,8 +146,19 @@ function MenuLeft({ isIconClicked }: any) {
   const [defaultSelectedKeys, setDefaultSelectedKeys] = useState<any[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+
+  const updateUserType = () => {
+    const loggedInUser = getLoggedInUser();
+    if (loggedInUser) {
+      setUser(loggedInUser);
+    } else {
+      setUser(null);
+    }
+  };
 
   useEffect(() => {
+    updateUserType();
     const currentPath = location.pathname;
 
     const selectedItem = items?.find((item: any) =>
@@ -175,6 +194,14 @@ function MenuLeft({ isIconClicked }: any) {
     var selectedItem: any = encontrarItemDoMenu(items ? items : [], e.key);
     if (selectedItem && selectedItem.uri) {
       navigate(selectedItem.uri);
+    }
+  };
+
+  const renderMenuItems = () => {
+    if (!user || user.userType == 'Convidado') {
+      return items!.filter(item => item!.key === 'consultas' || item!.key === 'inicio')
+    } else {
+      return items;
     }
   };
 
@@ -215,7 +242,7 @@ function MenuLeft({ isIconClicked }: any) {
             defaultOpenKeys={["sub1"]}
             mode="inline"
             inlineCollapsed={!isIconClicked}
-            items={items}
+            items={renderMenuItems()}
           ></Menu>
         </div>
       )}

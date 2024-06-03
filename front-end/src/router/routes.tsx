@@ -4,10 +4,10 @@ import Login from "../views/app/Login";
 import RootLayout from "../layout";
 
 import Logout from "../views/app/Logout";
-
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../context/AuthService';
 import Consultas from "../views/Consultas/ProximaAula";
 import Relatorios from "../views/Alocacoes";
-import Error404 from "../components/404";
+import Error403 from "../components/403";
 import Equipamentos from "../views/Cadastros/Equipamento";
 import SemestresLetivos from "../views/Cadastros/SemestreLetivo";
 import Locais from "../views/Cadastros/local";
@@ -31,8 +31,28 @@ export interface RouteConfig {
   children?: RouteConfig[];
 }
 
+const isUserAdmin = () => {
+  const user = getLoggedInUser();
+  return user && user.userType == 'Administrador';
+};
+
+const isAdminRoute = (routePath: string) => {
+  const adminPrefixes = ['Cadastros', 'Alocações', 'Relatórios'];
+  return adminPrefixes.some(prefix => routePath.startsWith(`${prefix}`));
+};
+
+const applyAdminRestriction = (routes: RouteConfig[]) => {
+  routes.forEach(route => {
+    if (isAdminRoute(route.path)) {
+      route.element = isUserAdmin() ? route.element : <Error403 />;
+    }
+    if (route.children) {
+      applyAdminRestriction(route.children);
+    }
+  });
+};
+
 const routes: RouteConfig[] = [
-  // { path: "/login", element: <Login />, permissions: "" },
   { path: "/logout", element: <Logout />, permissions: "" },
   {
     path: "",
@@ -87,19 +107,10 @@ const routes: RouteConfig[] = [
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       { path: "Alocações/Logs", element: <Logs />, permissions: "" },
-      // {
-      //   path: "*",
-      //   permissions: "",
-      //   element: (
-      //     <>
-      //       {" "}
-      //       <Navigate to="/404" replace />
-      //       <Error404 />
-      //     </>
-      //   ),
-      // },
     ],
   },
 ];
+
+applyAdminRestriction(routes);
 
 export default routes;
