@@ -52,7 +52,7 @@ export default function Login() {
       window.location.reload();
       message.success("Login efetuado com sucesso!");
     } catch (error) {
-      console.error('Erro ao realizar login:', error);
+      message.error("Erro ao realizar login, tente novamente!");
     }
   };
 

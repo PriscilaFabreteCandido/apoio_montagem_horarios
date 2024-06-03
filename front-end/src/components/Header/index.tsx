@@ -47,20 +47,12 @@ function getItem(
 const itemsMenu: MenuProps["items"] = [
   getItem("Entrar no sistema", "entrar", <LoginOutlined />, "/Login"),
   getItem("Sair da Aplicação", "sair", <LogoutOutlined />, "/Login"),
-  getItem("Segurança", "seguranca", <SecurityScanOutlined />, "/Seguranca", [
-    getItem(
-      "Redefinir Senha",
-      "redefinirSenha",
-      <FormOutlined />,
-      "/RedefinirSenha"
-    ),
-    getItem(
-      "Gerenciar Usuários",
-      "redefinirSenha",
-      <UserOutlined  />,
-      "/RedefinirSenha"
-    ),
-  ]),
+  getItem(
+    "Gerenciar Usuários",
+    "gerenciarusers",
+    <UserOutlined  />,
+    "/Users"
+  ),
 ];
 
 function Header({ onIconClick }: any) {
@@ -145,7 +137,7 @@ function Header({ onIconClick }: any) {
     if (user) {
       return itemsMenu!.filter(item => item!.key != 'entrar');
     } else {
-      return itemsMenu!.filter(item => item!.key != 'sair');
+      return itemsMenu!.filter(item => item!.key == 'entrar');
     }
   };
 

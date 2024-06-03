@@ -2,9 +2,7 @@ package br.com.sistema.Controller;
 
 import br.com.sistema.Config.Security.SecurityFilter;
 import br.com.sistema.Config.Security.TokenService;
-import br.com.sistema.DTO.AuthDTO;
-import br.com.sistema.DTO.AuthResponseDTO;
-import br.com.sistema.DTO.RegisterDTO;
+import br.com.sistema.DTO.*;
 import br.com.sistema.Model.Usuario;
 import br.com.sistema.Repository.UserRepository;
 import br.com.sistema.Service.AuthService;
@@ -22,6 +20,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Tag(name = "AuthController")
@@ -64,6 +64,12 @@ public class AuthController {
         this.userRepository.save(newUser);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UsersDTO>> findAllUsers() {
+        List<UsersDTO> usersDTOList = authService.findAll();
+        return new ResponseEntity<>(usersDTOList, usersDTOList.isEmpty() ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
 }

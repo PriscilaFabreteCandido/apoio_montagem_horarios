@@ -23,6 +23,7 @@ import HorariosAula from "../views/Cadastros/HorariosAula";
 import ProximaAula from  "../views/Consultas/ProximaAula";
 import CoordenadoresTurno from "../views/Cadastros/CoordenadoresTurno";
 import Logs from  "../views/Consultas/Logs";
+import Users from "../views/Users";
 
 export interface RouteConfig {
   path: string;
@@ -37,7 +38,7 @@ const isUserAdmin = () => {
 };
 
 const isAdminRoute = (routePath: string) => {
-  const adminPrefixes = ['Cadastros', 'Alocações', 'Relatórios'];
+  const adminPrefixes = ['Cadastros', 'Alocações', 'Relatórios', 'Users'];
   return adminPrefixes.some(prefix => routePath.startsWith(`${prefix}`));
 };
 
@@ -107,6 +108,9 @@ const routes: RouteConfig[] = [
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       { path: "Alocações/Logs", element: <Logs />, permissions: "" },
+
+      //Usuarios
+      { path: "Users", element: <Users />, permissions: "" },
     ],
   },
 ];

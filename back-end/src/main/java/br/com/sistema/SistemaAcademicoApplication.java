@@ -27,13 +27,7 @@ public class SistemaAcademicoApplication implements CommandLineRunner {
 		String encryptedPassword1 = new BCryptPasswordEncoder().encode("adm123");
 		Usuario newUser1 = new Usuario("adm", encryptedPassword1, UserRole.valueOf("ADMIN"));
 
-		this.userRepository.save(newUser1);
-
-		// INSERINDO USUARIO EXTERNO
-		String encryptedPassword2 = new BCryptPasswordEncoder().encode("user123");
-		Usuario newUser2 = new Usuario("user", encryptedPassword2, UserRole.valueOf("USER"));
-
-		this.userRepository.save(newUser2);
+		this.userRepository.save(newUser1);;
 	}
 
 }
