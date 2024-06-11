@@ -29,6 +29,11 @@
     border-collapse: collapse;
     width: 100%;
   }
+
+  .info-data {
+    display: flex;
+    justify-content: space-between;
+  }
   
   th, td {
     border: 1px solid black;

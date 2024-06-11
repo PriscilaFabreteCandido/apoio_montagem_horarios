@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Select, Input, Button, Modal} from "antd";
 import { get } from "../../../api/axios";
 import { message } from "antd/lib";
 import JsBarcode from "jsbarcode";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'
+import imgifes from "../../../assets/images/ifes.png";
 
 const { Option } = Select;
 
@@ -53,7 +57,7 @@ const HorarioTable = () => {
   const [aulas, setAulas] = useState<Aula[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-  
+  const horarioRef = useRef(null);
 
   useEffect(() => {
     setPeriodosAcademicos();
@@ -90,6 +94,66 @@ const HorarioTable = () => {
         "Erro ao processar o formulário: " + error.response.data.message
       );
       console.error("Erro ao obter próxima aula:", error);
+    }
+  };
+
+  const handleImprimirHorarioClick = () => {
+    if (horarioRef.current) {
+      html2canvas(horarioRef.current).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let solicitante = ''
+  
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+  
+        const x = (pageWidth - imgWidth) / 2;
+
+        pdf.setFillColor(44, 102, 60);
+        pdf.setTextColor(255);
+        pdf.setFontSize(14);
+        pdf.rect(x - 40, 9, imgWidth, 7, 'F');
+        pdf.text("Horário de Aulas", x + 1, 14);
+  
+        pdf.setTextColor(0);
+        pdf.setFontSize(10);
+
+        if(professor) {
+          solicitante = professor.nome;
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 23, imgWidth, 5.5, 'F');
+          pdf.text(`Professor: ${professor.nome}`, x + 1, 27);
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 30, imgWidth, 5.5, 'F');
+          pdf.text(`Siape: ${professor.matricula}`, x + 1, 34);
+        } else {
+          solicitante = aluno!.nome;
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 23, imgWidth, 5.5, 'F');
+          pdf.text(`Aluno: ${aluno?.nome}`, x + 1, 27);
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 30, imgWidth, 5.5, 'F');
+          pdf.text(`Matrícula: ${aluno?.matricula}`, x + 1, 34);
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 37, imgWidth, 5.5, 'F');
+          pdf.text(`Curso: ${aluno?.curso.nome}`, x + 1, 41);
+          pdf.setFillColor(227, 227, 227);
+          pdf.rect(x, 44, imgWidth, 5.5, 'F');
+          pdf.text(`Turma: ${aluno?.turma.nome}`, x + 1, 48);
+        }
+  
+        pdf.addImage(imgData, 'PNG', x, 54, imgWidth, imgHeight); 
+
+        const imgWidthFooter = 37;
+        const imgHeightFooter = 17;
+        const xFooter = pageWidth - imgWidthFooter - 10;
+        const yFooter = 5;
+        pdf.addImage(imgifes, 'PNG', xFooter, yFooter, imgWidthFooter, imgHeightFooter);
+  
+        pdf.save(`horario_${solicitante}.pdf`);
+      });
     }
   };
 
@@ -273,7 +337,7 @@ const HorarioTable = () => {
       // Adicionar a linha da tabela ao array
       tabela.push(
         <tr key={dia}>
-          <td>{dia}</td>
+          <td style={{ padding: '1px' }}>{dia}</td>
           {celulas}
         </tr>
       );
@@ -435,13 +499,22 @@ const HorarioTable = () => {
           
           th, td {
             border: 1px solid black;
-            padding: 8px;
+            padding: 2px;
             text-align: center;
+            font-size: 18px;
           }
           
           th {
-            background-color: #f2f2f2;
+            background-color: #e7e7e7;
             font-weight: bold;
+          }
+
+          #barcode {
+            height: 125px
+          }
+
+          .info-data {
+            display: flex;
           }
 
           .info-table {
@@ -450,8 +523,12 @@ const HorarioTable = () => {
             margin-bottom: 50px;
           }
 
+          .horario {
+            margin-top: 1rem;
+          }
+
           .info-cell {
-            font-size: 12px; // Defina o tamanho da fonte desejado  
+            font-size: 20px;
           }
         
 
@@ -487,15 +564,24 @@ const HorarioTable = () => {
           Limpar
         </Button>
       
-        {(aluno || professor) && (
-  <Button
-    type="primary"
-    onClick={handleImprimirMatriculaClick}
-    style={{ marginLeft: 10 }}
-  >
-    Imprimir matrícula
-  </Button>
-)}
+  {(aluno || professor) && (
+    <Button
+      type="primary"
+      onClick={handleImprimirMatriculaClick}
+      style={{ marginLeft: 10 }}
+    >
+      Imprimir matrícula
+    </Button>
+  )}
+  {(aluno || professor) && (
+    <Button
+      type="primary"
+      onClick={handleImprimirHorarioClick}
+      style={{ marginLeft: 10 }}
+    >
+      Gerar PDF
+    </Button>
+  )}
 
       <Modal
         title="Selecione a quantidade de etiquetas"
@@ -515,50 +601,54 @@ const HorarioTable = () => {
       </Modal>
 
       </div>
-      {aluno && renderizarTabelaAluno()}{" "}
-      {/* Renderiza a tabela do aluno se houver dados de aluno */}
-      {professor && renderizarTabelaProfessor()}
-      <table className="table-container">
-        <thead>
-          <tr>
-            <th></th>
-            <th colSpan={6}>MATUTINO</th>
-            <th colSpan={6}>VESPERTINO</th>
-            <th colSpan={4}>NOTURNO</th>
-          </tr>
-          <tr>
-            <th></th>
-            <th>
-              07:00 <br /> 07:50
-            </th>
-            <th>
-              07:50 <br /> 08:40
-            </th>
-            <th>
-              08:40 <br /> 09:30
-            </th>
-            <th>
-              09:50 <br /> 10:40
-            </th>
-            <th>
-              10:40 <br /> 11:30
-            </th>
-            <th>
-              11:30 <br /> 12:20
-            </th>
-            <th>
-              13:00 <br /> 13:50
-            </th>
-            <th>
-              13:50 <br /> 14:40
-            </th>
-            <th>
-              14:40 <br /> 15:30
-            </th>
-            <th>
-              15:50 <br /> 16:40
-            </th>
-            <th>
+      <div className="info-data">
+        {aluno && renderizarTabelaAluno()}{" "}
+        {/* Renderiza a tabela do aluno se houver dados de aluno */}
+        {professor && renderizarTabelaProfessor()}
+        <canvas id="barcode"></canvas>
+      </div>
+      <div className="horario" ref={horarioRef}>
+        <table className="table-container">
+          <thead>
+            <tr>
+              <th></th>
+              <th colSpan={6}>MATUTINO</th>
+              <th colSpan={6}>VESPERTINO</th>
+              <th colSpan={4}>NOTURNO</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>
+                07:00 <br /> 07:50
+              </th>
+              <th>
+                07:50 <br /> 08:40
+              </th>
+              <th>
+                08:40 <br /> 09:30
+              </th>
+              <th>
+                09:50 <br /> 10:40
+              </th>
+              <th>
+                10:40 <br /> 11:30
+              </th>
+              <th>
+                11:30 <br /> 12:20
+              </th>
+              <th>
+                13:00 <br /> 13:50
+              </th>
+              <th>
+                13:50 <br /> 14:40
+              </th>
+              <th>
+                14:40 <br /> 15:30
+              </th>
+              <th>
+                15:50 <br /> 16:40
+              </th>
+                  <th>
               16:40 <br /> 17:30
             </th>
             <th>
@@ -579,8 +669,8 @@ const HorarioTable = () => {
           </tr>
         </thead>
         <tbody>{renderizarTabela()}</tbody>
-      </table>
-      <canvas id="barcode"></canvas>
+      </table>  
+      </div>
     </div>
   );
 };
