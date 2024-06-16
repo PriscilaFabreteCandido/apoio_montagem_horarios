@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST,"/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/emails/send-email").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/alunos/**").hasRole("ADMIN")
