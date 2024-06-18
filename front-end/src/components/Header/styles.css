@@ -25,9 +25,14 @@
 }
 
 .info-user {
-  position: relative;
-  top: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+h6 {
+  margin: 0 !important;
+} 
 
 .font-14 {
   font-size: 14px;

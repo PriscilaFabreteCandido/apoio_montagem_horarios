@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Select, Input, Button, Modal} from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Select, Input, Button, Modal } from "antd";
 import { get } from "../../../api/axios";
 import { message } from "antd/lib";
 import JsBarcode from "jsbarcode";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import imgifes from "../../../assets/images/ifes.png";
 
 const { Option } = Select;
 
@@ -53,7 +56,11 @@ const HorarioTable = () => {
   const [aulas, setAulas] = useState<Aula[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-  
+  const horarioRef = useRef(null);
+  const [email, setEmail] = useState('');
+  const [isEmailInputVisible, setIsEmailInputVisible] = useState(false);
+  const [periodo, setPeriodo] = useState('');
+
 
   useEffect(() => {
     setPeriodosAcademicos();
@@ -69,14 +76,19 @@ const HorarioTable = () => {
   };
 
   const handlePeriodoChange = (value: number) => {
-    const periodo = periodosLetivos.find((periodo) => periodo.id === value);
-    if (periodo) {
-      setPeriodoSelecionado(periodo);
-      console.log("Período acadêmico selecionado:", periodo);
+    const periodoSelecionado = periodosLetivos.find((periodo) => periodo.id === value);
+    if (periodoSelecionado) {
+        setPeriodoSelecionado(periodoSelecionado);
+        const periodoFormatado = renderPeriodoAcademico(periodoSelecionado);
+        setPeriodo(periodoFormatado);
+        console.log("Período acadêmico selecionado:", periodoFormatado);
     } else {
-      setPeriodoSelecionado(null);
+        setPeriodoSelecionado(null);
+        setPeriodo('');
     }
-  };
+
+    console.log("Mostrando periodo: " + periodo);
+};
 
   const carregarTabela = async () => {
     try {
@@ -147,6 +159,117 @@ const HorarioTable = () => {
     showError("Matrícula não encontrada.");
   };
 
+  const generatePDF = async () => {
+    if (!horarioRef.current) return null;
+
+    const canvas = await html2canvas(horarioRef.current);
+    const pageWidth = 1300;
+    const pageHeight = 450;
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'pt',
+      format: [pageWidth, pageHeight],
+    });
+
+    const imgWidth = 1200;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let solicitante = '';
+
+    const x = (pageWidth - imgWidth) / 2;
+
+    // Cabeçalho
+    pdf.setFillColor(44, 102, 60);
+    pdf.setTextColor(255);
+    pdf.setFontSize(20);
+    pdf.rect(0, 0, pageWidth, 30, 'F');
+    pdf.text("Horário de Aulas", pageWidth / 2, 20, { align: 'center' });
+
+    pdf.setTextColor(0);
+    pdf.setFontSize(10);
+
+    if (professor) {
+      solicitante = professor.nome;
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 40, imgWidth, 20, 'F');
+      pdf.text(`Professor: ${professor.nome}`, x + 10, 50);
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 60, imgWidth, 20, 'F');
+      pdf.text(`Siape: ${professor.matricula}`, x + 10, 70);
+    } else {
+      solicitante = aluno!.nome;
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 40, imgWidth, 20, 'F');
+      pdf.text(`Aluno: ${aluno?.nome}`, x + 10, 50);
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 60, imgWidth, 20, 'F');
+      pdf.text(`Matrícula: ${aluno?.matricula}`, x + 10, 70);
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 80, imgWidth, 20, 'F');
+      pdf.text(`Curso: ${aluno?.curso.nome}`, x + 10, 90);
+      pdf.setFillColor(227, 227, 227);
+      pdf.rect(x, 100, imgWidth, 20, 'F');
+      pdf.text(`Turma: ${aluno?.turma.nome}`, x + 10, 110);
+    }
+
+    // Adiciona a imagem capturada como tabela
+    const margins = { top: 150, bottom: 60, left: 40, right: 40 };
+    pdf.addImage(imgData, 'PNG', margins.left, margins.top, imgWidth, imgHeight);
+
+    // Rodapé
+    const imgWidthFooter = 37;
+    const imgHeightFooter = 17;
+    const xFooter = pageWidth - imgWidthFooter - 10;
+    const yFooter = pageHeight - imgHeightFooter - 10;
+    pdf.addImage(imgifes, 'PNG', xFooter, yFooter, imgWidthFooter, imgHeightFooter);
+
+    return { pdf, solicitante };
+  };
+
+  // Função para baixar o PDF
+  const handleBaixarPDFClick = async () => {
+    const result = await generatePDF();
+    if (result) {
+      const { pdf, solicitante } = result;
+      pdf.save(`horario_${solicitante}.pdf`);
+    }
+  };
+
+  const handleEnviarPDFClick = async () => {
+    const result = await generatePDF();
+    if (result) {
+      const { pdf, solicitante } = result;
+      const pdfBlob = pdf.output('blob');
+      const file = new File([pdfBlob], `horario_${solicitante}.pdf`, { type: 'application/pdf' });
+
+      const formData = new FormData();
+      formData.append('source', 'seu-email@dominio.com');
+      formData.append('target', email);
+      formData.append('subject', 'Horário de Aulas');
+      formData.append('message',  `Olá ${solicitante}, segue em anexo os horários de aula referente ao período ${periodo}.`);
+      formData.append('attachment', file);
+
+      fetch('http://localhost:8080/api/emails/send-email', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Ocorreu um erro ao enviar o email.');
+          }
+          alert('Email enviado com sucesso!');
+        })
+        .catch(error => {
+          console.error('Erro ao enviar email:', error);
+          alert('Ocorreu um erro ao enviar o email.');
+        });
+    }
+  };
+
+
+
+
+
   const showError = (errorMessage: string) => {
     message.error(errorMessage);
   };
@@ -155,7 +278,7 @@ const HorarioTable = () => {
     setAulas([]);
     setAluno(null);
     setProfessor(null);
-    setMatricula(''); 
+    setMatricula('');
   };
 
   const renderPeriodoAcademico = (periodoAcademico: PeriodoAcademico) => {
@@ -204,7 +327,7 @@ const HorarioTable = () => {
     setIsModalVisible(false); // Fechar o modal
   };
 
-  
+
   const renderizarTabela = () => {
     // Array para armazenar as células da tabela
     const tabela: JSX.Element[] = [];
@@ -339,19 +462,19 @@ const HorarioTable = () => {
       });
     }
   };
-  
+
   const handleImprimirEtiquetasClick = () => {
     const matricula = aluno?.matricula || professor?.matricula;
     if (!matricula) {
       showError("Aluno ou professor não encontrado ou matrícula indefinida.");
       return;
     }
-  
+
     const larguraEtiqueta = 38; // Largura individual da etiqueta em mm
     const larguraTotal = 3 * larguraEtiqueta; // Largura total em mm
-  
+
     const printWindow = window.open("", "_blank", `width=${larguraTotal}mm`);
-  
+
     let etiquetasContent = `
         <html>
             <head>
@@ -394,16 +517,16 @@ const HorarioTable = () => {
             </head>
             <body>
     `;
-  
+
     for (let i = 0; i < selectedQuantity; i++) {
       const canvas = document.createElement("canvas");
       JsBarcode(canvas, matricula, {
         format: "CODE128",
         displayValue: false,
       });
-  
+
       const imageData = canvas.toDataURL("image/png");
-  
+
       etiquetasContent += `
           <div class="etiqueta">
               <img src="${imageData}" />
@@ -411,51 +534,49 @@ const HorarioTable = () => {
           </div>
       `;
     }
-  
+
     etiquetasContent += `
             </body>
         </html>
     `;
-  
+
     printWindow?.document.write(etiquetasContent);
     printWindow?.document.close();
     printWindow?.print();
   };
-  
+
 
   return (
     <div>
       <style>
         {`
-          .table-container {
-            border: 2px solid black;
-            border-collapse: collapse;
-            width: 100%;
-          }
-          
-          th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-          }
-          
-          th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
+                .table-container {
+                    border: 2px solid black;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                
+                th, td {
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: center;
+                }
+                
+                th {
+                    background-color: #f2f2f2;
+                    font-weight: bold;
+                }
 
-          .info-table {
-            width: auto;
-            margin-top: 10px;
-            margin-bottom: 50px;
-          }
+                .info-table {
+                    width: auto;
+                    margin-top: 10px;
+                    margin-bottom: 50px;
+                }
 
-          .info-cell {
-            font-size: 12px; // Defina o tamanho da fonte desejado  
-          }
-        
-
-        `}
+                .info-cell {
+                    font-size: 12px; // Defina o tamanho da fonte desejado  
+                }
+            `}
       </style>
       <div style={{ marginBottom: "16px" }}>
         <Select
@@ -486,39 +607,57 @@ const HorarioTable = () => {
         >
           Limpar
         </Button>
-      
         {(aluno || professor) && (
-  <Button
-    type="primary"
-    onClick={handleImprimirMatriculaClick}
-    style={{ marginLeft: 10 }}
-  >
-    Imprimir matrícula
-  </Button>
-)}
-
-      <Modal
-        title="Selecione a quantidade de etiquetas"
-        visible={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-      >
-        <Select
-          defaultValue={1}
-          style={{ width: 120 }}
-          onChange={handleQuantityChange}
+          <>
+            <Button
+              type="primary"
+              onClick={handleBaixarPDFClick}
+              style={{ marginLeft: 10 }}
+            >
+              Baixar PDF
+            </Button>
+            <Button
+              type="primary"
+              onClick={() => setIsEmailInputVisible(true)}
+              style={{ marginLeft: 10 }}
+            >
+              Enviar PDF por e-mail
+            </Button>
+            {isEmailInputVisible && (
+              <div style={{ marginTop: '16px' }}>
+                <Input
+                  placeholder="Digite o e-mail"
+                  style={{ width: 300, marginRight: '10px' }}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <Button type="primary" onClick={handleEnviarPDFClick}>
+                  Enviar
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+        <Modal
+          title="Selecione a quantidade de etiquetas"
+          visible={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={handleModalCancel}
         >
-          <Option value={1}>1</Option>
-          <Option value={2}>2</Option>
-          <Option value={3}>3</Option>
-        </Select>
-      </Modal>
-
+          <Select
+            defaultValue={1}
+            style={{ width: 120 }}
+            onChange={handleQuantityChange}
+          >
+            <Option value={1}>1</Option>
+            <Option value={2}>2</Option>
+            <Option value={3}>3</Option>
+          </Select>
+        </Modal>
       </div>
-      {aluno && renderizarTabelaAluno()}{" "}
-      {/* Renderiza a tabela do aluno se houver dados de aluno */}
+      {aluno && renderizarTabelaAluno()}
       {professor && renderizarTabelaProfessor()}
-      <table className="table-container">
+      <table ref={horarioRef} className="table-container">
         <thead>
           <tr>
             <th></th>
@@ -584,5 +723,4 @@ const HorarioTable = () => {
     </div>
   );
 };
-
 export default HorarioTable;

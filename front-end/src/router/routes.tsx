@@ -1,12 +1,13 @@
 import { Navigate } from "react-router";
 import Home from "../views/app/home";
+import Login from "../views/app/Login";
 import RootLayout from "../layout";
 
 import Logout from "../views/app/Logout";
-
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../context/AuthService';
 import Consultas from "../views/Consultas/ProximaAula";
 import Relatorios from "../views/Alocacoes";
-import Error404 from "../components/404";
+import Error403 from "../components/403";
 import Equipamentos from "../views/Cadastros/Equipamento";
 import SemestresLetivos from "../views/Cadastros/SemestreLetivo";
 import Locais from "../views/Cadastros/local";
@@ -22,6 +23,7 @@ import HorariosAula from "../views/Cadastros/HorariosAula";
 import ProximaAula from  "../views/Consultas/ProximaAula";
 import CoordenadoresTurno from "../views/Cadastros/CoordenadoresTurno";
 import Logs from  "../views/Consultas/Logs";
+import Users from "../views/Users";
 
 export interface RouteConfig {
   path: string;
@@ -30,15 +32,38 @@ export interface RouteConfig {
   children?: RouteConfig[];
 }
 
+const isUserAdmin = () => {
+  const user = getLoggedInUser();
+  return user && user.userType == 'Administrador';
+};
+
+const isAdminRoute = (routePath: string) => {
+  const adminPrefixes = ['Cadastros', 'Alocações', 'Relatórios', 'Users'];
+  return adminPrefixes.some(prefix => routePath.startsWith(`${prefix}`));
+};
+
+const applyAdminRestriction = (routes: RouteConfig[]) => {
+  routes.forEach(route => {
+    if (isAdminRoute(route.path)) {
+      route.element = isUserAdmin() ? route.element : <Error403 />;
+    }
+    if (route.children) {
+      applyAdminRestriction(route.children);
+    }
+  });
+};
+
 const routes: RouteConfig[] = [
-  // { path: "/login", element: <Login />, permissions: "" },
   { path: "/logout", element: <Logout />, permissions: "" },
   {
     path: "",
     element: <RootLayout />,
     permissions: "",
     children: [
-      // Inicio
+      //Login
+      { path: "Login", element: <Login />, permissions: "" },
+
+      //Inicio
       { path: "Inicio", element: <Home />, permissions: "" },
 
       //Cadastros
@@ -83,19 +108,13 @@ const routes: RouteConfig[] = [
       //Eventos 
       { path: "Alocações/Eventos", element: <Alocacoes />, permissions: "" },
       { path: "Alocações/Logs", element: <Logs />, permissions: "" },
-      // {
-      //   path: "*",
-      //   permissions: "",
-      //   element: (
-      //     <>
-      //       {" "}
-      //       <Navigate to="/404" replace />
-      //       <Error404 />
-      //     </>
-      //   ),
-      // },
+
+      //Usuarios
+      { path: "Users", element: <Users />, permissions: "" },
     ],
   },
 ];
+
+applyAdminRestriction(routes);
 
 export default routes;
