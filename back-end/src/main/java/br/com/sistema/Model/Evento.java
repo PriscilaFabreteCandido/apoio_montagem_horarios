@@ -23,4 +23,8 @@ public class Evento {
 
     @Temporal(TemporalType.TIME)
     private Date horaFim;
+
+    @ManyToOne
+    @JoinColumn(name = "local_id") // nome da coluna na tabela Evento que referencia a tabela Local
+    private Local local;
 }

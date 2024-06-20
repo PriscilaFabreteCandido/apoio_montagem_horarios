@@ -9,6 +9,7 @@ import java.util.Date;
 public class EventoDTO {
 
     private Long id;
+
     private String descricao;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT-3")
@@ -19,6 +20,8 @@ public class EventoDTO {
 
     @JsonFormat(pattern = "HH:mm", timezone = "GMT-3")
     private Date horaFim;
+
+    private LocalDTO local;
 
 
 }

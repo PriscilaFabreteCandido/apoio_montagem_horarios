@@ -6,6 +6,7 @@ import JsBarcode from "jsbarcode";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import imgifes from "../../../assets/images/ifes.png";
+import { PrinterOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
@@ -607,19 +608,49 @@ const HorarioTable = () => {
         >
           Limpar
         </Button>
+
+        {(aluno || professor) && (
+          <Button
+    type="primary"
+    onClick={handleImprimirMatriculaClick}
+    style={{ marginLeft: 10, backgroundColor: '#1890ff', borderColor: '#1890ff' }}
+    icon={<PrinterOutlined style={{ fontSize: '16px' }} />}
+  >
+    Imprimir matrícula
+  </Button>
+)}
+
+      <Modal
+        title="Selecione a quantidade de etiquetas"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      >
+        <Select
+          defaultValue={1}
+          style={{ width: 120 }}
+          onChange={handleQuantityChange}
+        >
+          <Option value={1}>1</Option>
+          <Option value={2}>2</Option>
+          <Option value={3}>3</Option>
+        </Select>
+      </Modal>
+      
         {(aluno || professor) && (
           <>
             <Button
               type="primary"
               onClick={handleBaixarPDFClick}
-              style={{ marginLeft: 10 }}
+              style={{ marginLeft: 10, background: "#cc0b00"}}
+              
             >
               Baixar PDF
             </Button>
             <Button
               type="primary"
               onClick={() => setIsEmailInputVisible(true)}
-              style={{ marginLeft: 10 }}
+              style={{ marginLeft: 10, background: "#cc0b00"}}
             >
               Enviar PDF por e-mail
             </Button>

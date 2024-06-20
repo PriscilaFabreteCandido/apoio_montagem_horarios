@@ -129,12 +129,6 @@ const items: MenuProps["items"] = [
       <FileTextOutlined />,
       "/Consultas"
     ),
-    getItem(
-      "Próxima aula",
-      "proximaaula",
-      <CalendarOutlined />,
-      "/Consultas/Proxima Aula"
-    ),
   ]),
   getItem("Alocações", "alocacoes", <PlayCircleOutlined />, "/PGR", [
     getItem("Eventos", "evento", <BarChartOutlined />, "/Alocações/Eventos"),

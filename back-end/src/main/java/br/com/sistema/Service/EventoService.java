@@ -33,7 +33,17 @@ public class EventoService {
 
         repository.save(entity);
 
-        createLog("Evento " + eventoDTO.getDescricao() + " criado.");
+        String logMessage = String.format(
+                "Criou o evento '%s' (Local: %s - Data: %s - Horário: %s até %s)",
+                eventoDTO.getDescricao(),
+                eventoDTO.getLocal().getDescricao(),
+                formatarData(eventoDTO.getData()),
+                formatarHora(eventoDTO.getHoraInicio()),
+                formatarHora(eventoDTO.getHoraFim())
+        );
+
+
+        createLog(logMessage);
 
         return mapper.toDto(entity);
     }
@@ -49,10 +59,19 @@ public class EventoService {
         EventoDTO dto = mapper.toDto(entity);
 
         String logMessage = String.format(
-                "Evento '%s' %s %s-%s alterado para '%s' %s %s-%s",
-                antigo.getDescricao(), formatarData(antigo.getData()), formatarHora(antigo.getHoraInicio()), formatarHora(antigo.getHoraFim()),
-                dto.getDescricao(), formatarData(dto.getData()), formatarHora(dto.getHoraInicio()), formatarHora(dto.getHoraInicio())
+                "Alterou o evento '%s' (Local: %s - Data: %s - Horário: %s até %s) para '%s' (Local: %s - Data: %s - Horário: %s até %s)",
+                antigo.getDescricao(),
+                antigo.getLocal().getDescricao(),
+                formatarData(antigo.getData()),
+                formatarHora(antigo.getHoraInicio()),
+                formatarHora(antigo.getHoraFim()),
+                dto.getDescricao(),
+                dto.getLocal().getDescricao(),
+                formatarData(dto.getData()),
+                formatarHora(dto.getHoraInicio()),
+                formatarHora(dto.getHoraFim())
         );
+
 
         createLog(logMessage);
 
@@ -63,7 +82,11 @@ public class EventoService {
         EventoDTO eventoDTO = findById(id);
         repository.delete(mapper.toEntity(eventoDTO));
 
-        String logMessage = String.format("Evento '%s' excluído.", eventoDTO.getDescricao());
+        String logMessage = String.format(
+                "Excluiu o evento '%s'.",
+                eventoDTO.getDescricao()
+        );
+
         createLog(logMessage);
     }
 
