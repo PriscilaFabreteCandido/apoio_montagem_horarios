@@ -204,6 +204,7 @@ function MenuLeft({ isIconClicked }: any) {
       <div
         style={{
           width: "100%",
+          margin: "1rem 0rem",
           padding: "1rem",
           height: "60px",
           display: "flex",
@@ -216,7 +217,7 @@ function MenuLeft({ isIconClicked }: any) {
         <img
           src={isIconClicked ? transferir : logo}
           alt="Descrição da imagem"
-          style={{ width: "100%", height: "auto", }}
+          style={{ width: "95%", height: "auto", }}
         />
       </div>
 

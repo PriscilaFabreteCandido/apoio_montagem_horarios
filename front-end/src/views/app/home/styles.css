@@ -19,6 +19,88 @@
 #home h1, #home  h2, #home  h3,  #home h4, #home h5, #home h6, #home  span{
   padding: 0;
   margin: 0;
-  color: white;
+  color: #2c343a;
 }
-  
+
+#home {
+  padding: 0.4rem 0.4rem 3rem 0.4rem;
+}
+
+#home h1 {
+  margin-bottom: 2rem;
+}
+
+#home h4 {
+  margin-bottom: 1rem;
+}
+
+.access {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: center;
+}
+
+.access div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 6px;
+  padding: 1.4rem;
+  align-items: center;
+  width: 25%;
+}
+
+.button {
+  color: white;
+  width: auto;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 16px;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #34383a;
+  font-size: 14px;
+}
+
+.card-1 {
+  background-color: #3b8a652f;
+}
+
+.card-1 .button {
+  background-color: #3b8a65;
+}
+
+.card-2 {
+  background-color: #521b9e1e;
+}
+
+.card-2 .button {
+  background-color: #511b9e;
+}
+
+.card-3 {
+  background-color: #3b5c8a2f;
+}
+
+.card-3 .button {
+  background-color: #3b5f8a;
+}
+
+@media (max-width: 920px) {
+  .access {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .access div {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@ import { ScheduleOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import "./styles.css";
 import { Button, Space } from "antd";
+import { User, clearLoggedInUser, saveLoggedInUser, getLoggedInUser } from '../../../context/AuthService';
 
 export enum Cores {
   AMARELO = "#F3CD03",
@@ -37,9 +38,44 @@ function Home() {
     { corFundo: Cores.AZUL_ESCURO, label: "PCMSO" },
   ];
 
+  const isAdmin = !!getLoggedInUser();
+
   return (
     <div id="home">
-     
+      <h1>Bem vindo!</h1>
+      <p>Acesso rápido</p>
+      <div className="access">
+        {isAdmin ? (
+          <>
+            <div className="card-1">
+              <p className="title">Cadastrar Aulas</p>
+              <p className="subtitle">Cadastre as aulas do semestre de acordo com horário, número de aulas, turma e sala.</p>
+              <a className="button" href="/Cadastros/Aulas">Cadastrar</a>
+            </div>
+            <div className="card-1">
+              <p className="title">Cadastrar Alunos</p>
+              <p className="subtitle">Cadastre alunos informando sua matrícula, curso e turma.</p>
+              <a className="button" href="/Cadastros/Alunos">Cadastrar</a>
+            </div>
+            <div className="card-3">
+              <p className="title">Consultar horário</p>
+              <p className="subtitle">Veja o horário completo, próxima aula e outras funcionalidades.</p>
+              <a className="button" href="/Consultas">Consultar</a>
+            </div>
+            <div className="card-2">
+              <p className="title">Alocar Eventos</p>
+              <p className="subtitle">Aloque eventos na instituição selecionando o local e horário do evento.</p>
+              <a className="button" href="/Alocações/Eventos">Alocar</a>
+            </div>
+          </>
+        ) : (
+          <div className="card-3">
+            <p className="title">Consultar horário</p>
+            <p className="subtitle">Veja o horário completo, próxima aula e outras funcionalidades.</p>
+            <a className="button" href="/Consultas">Consultar</a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
