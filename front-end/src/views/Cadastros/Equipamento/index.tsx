@@ -110,7 +110,8 @@ const Equipamentos: React.FC = () => {
       message.success("Equiapamento excluído com sucesso!");
       setEquipamentos(equipamentos.filter(x => x.id != id));
     }
-    catch (error) {
+    catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
 
     }
   }

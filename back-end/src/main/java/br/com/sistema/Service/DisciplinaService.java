@@ -3,11 +3,13 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.CoordenadoriaDTO;
 import br.com.sistema.DTO.DisciplinaDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.CoordenadoriaMapper;
 import br.com.sistema.Mapper.DisciplinaMapper;
 import br.com.sistema.Model.Coordenadoria;
 import br.com.sistema.Model.Disciplina;
+import br.com.sistema.Repository.AulaRepository;
 import br.com.sistema.Repository.CoordenadoriaRepository;
 import br.com.sistema.Repository.DisciplinaRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ public class DisciplinaService {
 
     private final DisciplinaRepository repository;
     private final DisciplinaMapper mapper;
+
+    private final AulaRepository aulaRepository;
 
     public DisciplinaDTO create(DisciplinaDTO disciplinaDTO){
 
@@ -44,6 +48,10 @@ public class DisciplinaService {
         Disciplina disciplina = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Disciplina com ID '" + id + "' não encontrado."));
 
+        if(aulaRepository.existsAulasByDisciplinaId(disciplina.getId())){
+            throw new BusinessException("Essa disciplina está em uma ou mais aula e não pode ser excluída.");
+        }
+
         repository.delete(disciplina);
     }
 
@@ -53,6 +61,8 @@ public class DisciplinaService {
     public DisciplinaDTO findById(Long id){
         Disciplina entity = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Disciplina com id '" + id + "' não encontrado."));
+
+
 
         return mapper.toDto(entity);
     }

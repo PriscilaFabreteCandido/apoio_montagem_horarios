@@ -100,7 +100,8 @@ const Coordenadorias: React.FC = () => {
       await remove(`coordenadorias/delete/${id}`);
       setCoordenadorias(coordenadorias.filter((coordenadoria) => coordenadoria.id !== id));
       message.success("Coordenadoria excluída com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir coordenadoria:", error);
     }
   };

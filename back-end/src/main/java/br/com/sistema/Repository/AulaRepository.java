@@ -66,7 +66,23 @@ public interface AulaRepository extends JpaRepository<Aula, Long> {
                                                       @Param("diaSemana") String diaSemana,
                                                       @Param("currentTime") Date currentTime);
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Aula a " +
+            "WHERE a.professor.id = :professorId")
+    boolean existsAulasByProfessorId(@Param("professorId") Long professorId);
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Aula a " +
+            "WHERE a.disciplina.id = :disciplinaId")
+    boolean existsAulasByDisciplinaId(@Param("disciplinaId") Long disciplinaId);
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Aula a " +
+            "WHERE a.local.id = :localId")
+    boolean existsAulasByLocalId(@Param("localId") Long localId);
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Aula a " +
+            "WHERE a.periodoAcademico.id = :periodoAcademicoId")
+    boolean existsAulasByPeriodoAcademicoId(@Param("periodoAcademicoId") Long periodoAcademicoId);
 }

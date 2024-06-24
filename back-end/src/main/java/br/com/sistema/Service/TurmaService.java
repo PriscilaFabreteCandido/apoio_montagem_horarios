@@ -2,6 +2,7 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.DisciplinaDTO;
 import br.com.sistema.DTO.TurmaDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.DisciplinaMapper;
 import br.com.sistema.Mapper.TurmaMapper;
@@ -42,6 +43,10 @@ public class TurmaService {
     public void delete(Long id) {
         Turma turma = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Turma com ID '" + id + "' não encontrado."));
+
+        if(turma.getAlunos() != null){
+            throw new BusinessException("Esta turma possui alunos cadastrados e não pode ser excluida.");
+        }
 
         repository.delete(turma);
     }

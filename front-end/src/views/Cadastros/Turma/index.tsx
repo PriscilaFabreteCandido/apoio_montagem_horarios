@@ -89,7 +89,8 @@ const Turmas: React.FC = () => {
       await remove(`turmas/delete/${id}`);
       setTurmas(turmas.filter((turma) => turma.id !== id));
       message.success("Turma excluída com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir turma:", error);
     }
   };

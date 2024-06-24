@@ -2,6 +2,7 @@ package br.com.sistema.Service;
 
 import br.com.sistema.DTO.CoordenadoriaDTO;
 import br.com.sistema.DTO.EquipamentoDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.CoordenadoriaMapper;
 import br.com.sistema.Mapper.EquipamentoMapper;
@@ -44,7 +45,7 @@ public class CoordenadoriaService {
                 .orElseThrow(() -> new EntityNotFoundException("Coordenadoria com ID '" + id + "' não encontrado."));
 
         if (!coordenadoria.getProfessores().isEmpty()) {
-            throw new RuntimeException("A coordenadoria está ligado a alguns professor, exclua o professor primeiro.");
+            throw new BusinessException("A coordenadoria está ligado a alguns professor, exclua o(s) professor(es) primeiro.");
         }
 
         repository.delete(coordenadoria);

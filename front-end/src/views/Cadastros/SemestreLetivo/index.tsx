@@ -108,10 +108,8 @@ const PeriodosAcademicos: React.FC = () => {
       setPeriodos(periodos.filter(periodo => periodo.id !== id));
       message.success("Período acadêmico excluído com sucesso");
     } catch (error: any) {
-      if (error.response && error.response.data && error.response.data.message) {
-        showError("Erro ao processar o formulário: " + error.response.data.message);
-      }
-      console.error("Erro ao excluir período acadêmico:", error);
+      showError("Erro ao processar o formulário: " + error.response.data.message);
+      console.error("Erro ao excluir professor:", error);
     }
   };
 

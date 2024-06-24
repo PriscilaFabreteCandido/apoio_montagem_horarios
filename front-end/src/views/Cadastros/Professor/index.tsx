@@ -131,13 +131,15 @@ const Professores: React.FC = () => {
     }
   };
   
+  
 
   const onDelete = async (id: number) => {
     try {
       await remove(`professores/delete/${id}`);
       setProfessores(professores.filter((professor) => professor.id !== id));
       message.success("Professor excluído com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir professor:", error);
     }
   };
@@ -157,6 +159,11 @@ const Professores: React.FC = () => {
     {
       title: "Matrícula",
       dataIndex: "matricula",
+    },
+    {
+      title: "Coordenadoria",
+      key: "coordenadoria",
+      render: (text, record) => record.coordenadoria?.descricao || 'N/A', // Usa render para acessar a propriedade aninhada
     },
     {
       title: "Ações",

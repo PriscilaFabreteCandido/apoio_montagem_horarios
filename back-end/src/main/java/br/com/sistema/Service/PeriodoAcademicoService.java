@@ -9,6 +9,7 @@ import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.PeriodoAcademicoMapper;
 import br.com.sistema.Model.Evento;
 import br.com.sistema.Model.PeriodoAcademico;
+import br.com.sistema.Repository.AulaRepository;
 import br.com.sistema.Repository.PeriodoAcademicoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class PeriodoAcademicoService {
 
     private final PeriodoAcademicoRepository repository;
     private final PeriodoAcademicoMapper mapper;
+
+    private final AulaRepository aulaRepository;
 
 
     public PeriodoAcademicoDTO create(PeriodoAcademicoDTO periodoAcademicoDTO){
@@ -48,6 +51,10 @@ public class PeriodoAcademicoService {
     public void delete(Long id){
         PeriodoAcademicoDTO periodoAcademicoDTO = findById(id);
         validate(periodoAcademicoDTO);
+
+        if(aulaRepository.existsAulasByPeriodoAcademicoId(id)){
+            throw new BusinessException("Este periodo não pode ser excluido pois pertence a alguma aula.");
+        }
 
         repository.delete(mapper.toEntity(periodoAcademicoDTO));
     }

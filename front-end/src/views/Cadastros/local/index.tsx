@@ -123,7 +123,8 @@ const Locais: React.FC = () => {
       await remove(`locais/delete/${id}`);
       setLocais(locais.filter((local) => local.id !== id));
       message.success("Local excluído com sucesso");
-    } catch (error) {
+    } catch (error: any) {
+      showError("Erro ao processar o formulário: " + error.response.data.message);
       console.error("Erro ao excluir local:", error);
     }
   };

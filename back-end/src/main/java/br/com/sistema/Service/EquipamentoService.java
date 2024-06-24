@@ -1,6 +1,7 @@
 package br.com.sistema.Service;
 
 import br.com.sistema.DTO.EquipamentoDTO;
+import br.com.sistema.Exception.BusinessException;
 import br.com.sistema.Exception.EntityNotFoundException;
 import br.com.sistema.Mapper.EquipamentoMapper;
 import br.com.sistema.Model.Equipamento;
@@ -41,7 +42,7 @@ public class EquipamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Equipamento com ID '" + id + "' não encontrado."));
 
         if (!equipamento.getLocalEquipamentos().isEmpty()) {
-            throw new RuntimeException("Equipamento está ligado a um local, exclua o local primeiro.");
+            throw new BusinessException("Equipamento está ligado a um local, exclua o local primeiro.");
         }
 
         repository.delete(equipamento);

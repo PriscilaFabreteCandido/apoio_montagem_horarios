@@ -547,7 +547,7 @@ const HorarioTable = () => {
         }
         body {
           margin: 0;
-          padding: 10px;
+          padding-left: 13px;
           font-family: Arial, sans-serif;
         }
         .periodo {
@@ -569,6 +569,7 @@ const HorarioTable = () => {
           font-weight: bold;
           margin-bottom: 5px;
           font-size: 16px;
+           text-align: center; /* Centralizar o conteúdo das células */
         }
         .titulo-principal {
           text-align: center;
@@ -693,7 +694,11 @@ const HorarioTable = () => {
 
     printWindow?.document.write(horarioContent);
     printWindow?.document.close();
-    printWindow?.print();
+    
+    setTimeout(() => {
+      printWindow?.print();
+      printWindow?.close();
+    }, 500); // Atraso de 500 ms para garantir o carregamento da imagem
   };
 
 

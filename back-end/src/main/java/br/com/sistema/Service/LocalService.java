@@ -8,6 +8,7 @@ import br.com.sistema.Mapper.LocalMapper;
 import br.com.sistema.Model.Equipamento;
 import br.com.sistema.Model.Local;
 import br.com.sistema.Model.LocalEquipamento;
+import br.com.sistema.Repository.AulaRepository;
 import br.com.sistema.Repository.EquipamentoRepository;
 import br.com.sistema.Repository.LocalEquipamentoRepository;
 import br.com.sistema.Repository.LocalRepository;
@@ -30,6 +31,8 @@ public class LocalService {
 
     private final EquipamentoRepository equipamentoRepository;
     private final LocalEquipamentoRepository localEquipamentoRepository;
+
+    private final AulaRepository aulaRepository;
 
     public LocalDTO create(LocalDTO localDTO) {
         Local entity = mapper.toEntity(localDTO);
@@ -133,6 +136,12 @@ public class LocalService {
     public void delete(Long id) {
         Local local = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Local com ID '" + id + "' não encontrado."));
+
+
+        if(aulaRepository.existsAulasByLocalId(id)){
+            throw new BusinessException("Não é possivel excluir o local pois ele pertence a alguma aula.");
+        }
+
 
         localEquipamentoRepository.deleteByLocal(local);
 

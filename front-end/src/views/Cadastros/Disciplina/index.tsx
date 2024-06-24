@@ -121,8 +121,9 @@ const Disciplinas: React.FC = () => {
       await remove(`disciplinas/delete/${id}`);
       setDisciplinas(disciplinas.filter((disciplina) => disciplina.id !== id));
       message.success("Disciplina excluída com sucesso");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao excluir disciplina:", error);
+      showError("Erro ao processar o formulário: " + error.response.data.message);
     }
   };
 
