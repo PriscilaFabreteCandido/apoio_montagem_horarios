@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import imgifes from "../../../assets/images/ifes.png";
 import { PrinterOutlined } from '@ant-design/icons';
+import logo from "../../../assets/images/logo-ifes-branco-no-borders.png"
 
 const { Option } = Select;
 
@@ -79,17 +80,17 @@ const HorarioTable = () => {
   const handlePeriodoChange = (value: number) => {
     const periodoSelecionado = periodosLetivos.find((periodo) => periodo.id === value);
     if (periodoSelecionado) {
-        setPeriodoSelecionado(periodoSelecionado);
-        const periodoFormatado = renderPeriodoAcademico(periodoSelecionado);
-        setPeriodo(periodoFormatado);
-        console.log("Período acadêmico selecionado:", periodoFormatado);
+      setPeriodoSelecionado(periodoSelecionado);
+      const periodoFormatado = renderPeriodoAcademico(periodoSelecionado);
+      setPeriodo(periodoFormatado);
+      console.log("Período acadêmico selecionado:", periodoFormatado);
     } else {
-        setPeriodoSelecionado(null);
-        setPeriodo('');
+      setPeriodoSelecionado(null);
+      setPeriodo('');
     }
 
     console.log("Mostrando periodo: " + periodo);
-};
+  };
 
   const carregarTabela = async () => {
     try {
@@ -247,7 +248,7 @@ const HorarioTable = () => {
       formData.append('source', 'seu-email@dominio.com');
       formData.append('target', email);
       formData.append('subject', 'Horário de Aulas');
-      formData.append('message',  `Olá ${solicitante}, segue em anexo os horários de aula referente ao período ${periodo}.`);
+      formData.append('message', `Olá ${solicitante}, segue em anexo os horários de aula referente ao período ${periodo}.`);
       formData.append('attachment', file);
 
       fetch('http://localhost:8080/api/emails/send-email', {
@@ -464,6 +465,239 @@ const HorarioTable = () => {
     }
   };
 
+  const formatarDataHora = () => {
+    const now = new Date();
+
+    // Obtendo dia, mês, ano, horas, minutos e segundos
+    const dia = String(now.getDate()).padStart(2, '0');
+    const mes = String(now.getMonth() + 1).padStart(2, '0'); // Mês é baseado em zero
+    const ano = now.getFullYear();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    const segundos = String(now.getSeconds()).padStart(2, '0');
+
+    // Montando a string no formato desejado
+    const dataHoraFormatada = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+
+    return dataHoraFormatada;
+  };
+
+
+  const handleImprimirHorarioClick = () => {
+    const nomePessoa = aluno?.nome || professor?.nome;
+    const matriculaPessoa = aluno?.matricula || professor?.matricula;
+    if (!matriculaPessoa) {
+      showError("Aluno ou professor não encontrado ou matrícula indefinida.");
+      return;
+    }
+
+    const printWindow = window.open("", "_blank");
+
+    // Objeto para traduzir abreviações de dias da semana para nomes completos
+
+    const styles = `
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+      }
+      .periodo {
+        margin-top: 20px;
+        font-size: 14px;
+      }
+      .info {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      .titulo {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      .titulo-principal {
+        text-align: center;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      .section {
+        margin-top: 30px; /* Espaço maior entre os dias da semana */
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+  
+      /* Estilos específicos para impressão */
+      @media print {
+        @page {
+          size: 80mm 300mm; /* Tamanho da página para a impressora térmica */
+          margin: 0;
+        }
+        body {
+          margin: 0;
+          padding: 10px;
+          font-family: Arial, sans-serif;
+        }
+        .periodo {
+          margin-top: 20px;
+          font-size: 14px;
+        }
+        .info {
+          margin-top: 10px;
+          font-weight: bold;
+        }
+        .logoIfes img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        filter: invert(100%);
+        margin: 0 0 18px 0;
+        }
+        .titulo {
+          font-weight: bold;
+          margin-bottom: 5px;
+          font-size: 16px;
+        }
+        .titulo-principal {
+          text-align: center;
+          font-weight: bold;
+          font-size: 18px;
+          margin-bottom: 10px;
+        }
+        .section {
+          margin-top: 30px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 20px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center; /* Centralizar o conteúdo das células */
+        }
+        th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+      }
+    </style>
+  `;
+
+    let horarioContent = `
+  <html>
+    <head>
+      <title>Horário</title>
+      ${styles} <!-- Incluindo estilos CSS -->
+    </head>
+    <body>
+      <div class="logoIfes">
+          <img src="${logo}" alt="Logo IFES" />
+      </div>
+      <div class="periodo">
+        <div class="titulo-principal">Horários das Aulas</div>
+        </br>
+        <div class="info">
+          ${aluno ? `Aluno:` : `Professor:`} ${nomePessoa}
+        </div>
+        <div class="info">
+          Matrícula: ${matriculaPessoa}
+        </div>
+        <div class="info">
+          Data/hora impressão: ${formatarDataHora()}
+        </div>
+      </div>
+`;
+
+    // Aqui continua o código para adicionar os dias da semana com espaçamento e tabelas...
+
+
+
+
+    // Agrupar aulas por dia da semana
+    const aulasPorDia: { [dia: string]: Aula[] } = aulas.reduce((acc: { [dia: string]: Aula[] }, aula) => {
+      const dia = aula.diaSemana.substring(0, 3);
+      if (!acc[dia]) acc[dia] = [];
+      acc[dia].push(aula);
+      return acc;
+    }, {});
+
+    const nomeDias = {
+      SEG: "Segunda-feira",
+      TER: "Terça-feira",
+      QUA: "Quarta-feira",
+      QUI: "Quinta-feira",
+      SEX: "Sexta-feira"
+    };
+
+    const diasSemana = ["SEG", "TER", "QUA", "QUI", "SEX"];
+    diasSemana.forEach((diaAbreviado) => {
+      const nomeDia = nomeDias[diaAbreviado as keyof typeof nomeDias];
+
+
+      if (aulasPorDia[diaAbreviado]) {
+        horarioContent += `
+          <div class="section">
+            <div class="titulo">${nomeDia}</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Horário</th>
+                  <th>Disciplina</th>
+                  <th>Professor</th>
+                  <th>Local</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        aulasPorDia[diaAbreviado].forEach((aula) => {
+          aula.horarios.forEach((horario) => {
+            horarioContent += `
+              <tr>
+                <td>${horario.horaInicio.substring(0, 5)} ${horario.horaFim.substring(0, 5)}</td>
+                <td>${aula.disciplina.sigla}</td>
+                <td>${renderProfessorAbreviado(aula.professor.nome)}</td>
+                <td>${renderDescricaoLocalAbreviada(aula.local.descricao)}</td>
+              </tr>
+            `;
+          });
+        });
+
+        horarioContent += `
+            </tbody>
+          </table>
+        </div>
+        `;
+      }
+    });
+
+    // Fechamento do conteúdo do HTML para impressão
+    horarioContent += `
+        </body>
+      </html>
+    `;
+
+    printWindow?.document.write(horarioContent);
+    printWindow?.document.close();
+    printWindow?.print();
+  };
+
+
+
   const handleImprimirEtiquetasClick = () => {
     const matricula = aluno?.matricula || professor?.matricula;
     if (!matricula) {
@@ -598,62 +832,68 @@ const HorarioTable = () => {
           onChange={(e) => setMatricula(e.target.value)}
           onPressEnter={handleVerProximaAulaClick}
         />
-        <Button type="primary" onClick={handleVerProximaAulaClick}>
-          Ver aulas
-        </Button>
-        <Button
-          type="primary"
-          onClick={handleLimparAulasClick}
-          style={{ marginLeft: "16px" }}
-        >
-          Limpar
-        </Button>
-
-        {(aluno || professor) && (
-          <Button
+<Button type="primary" onClick={handleVerProximaAulaClick}>
+  Ver aulas
+</Button>
+<Button
+  type="primary"
+  onClick={handleLimparAulasClick}
+  style={{ marginLeft: "16px" }}
+>
+  Limpar
+</Button>
+{(aluno || professor) && (
+  <Button
     type="primary"
     onClick={handleImprimirMatriculaClick}
-    style={{ marginLeft: 10, backgroundColor: '#1890ff', borderColor: '#1890ff' }}
+    style={{ marginLeft: "16px", backgroundColor: '#1890ff', borderColor: '#1890ff' }}
     icon={<PrinterOutlined style={{ fontSize: '16px' }} />}
   >
     Imprimir matrícula
   </Button>
 )}
-
-      <Modal
-        title="Selecione a quantidade de etiquetas"
-        visible={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
-      >
-        <Select
-          defaultValue={1}
-          style={{ width: 120 }}
-          onChange={handleQuantityChange}
-        >
-          <Option value={1}>1</Option>
-          <Option value={2}>2</Option>
-          <Option value={3}>3</Option>
-        </Select>
-      </Modal>
-      
-        {(aluno || professor) && (
-          <>
-            <Button
-              type="primary"
-              onClick={handleBaixarPDFClick}
-              style={{ marginLeft: 10, background: "#cc0b00"}}
-              
-            >
-              Baixar PDF
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => setIsEmailInputVisible(true)}
-              style={{ marginLeft: 10, background: "#cc0b00"}}
-            >
-              Enviar PDF por e-mail
-            </Button>
+{(aluno || professor) && (
+  <Button
+    type="primary"
+    onClick={handleImprimirHorarioClick}
+    style={{ marginLeft: "16px", backgroundColor: '#1890ff', borderColor: '#1890ff' }} // Cor verde para o botão "Imprimir horário"
+    icon={<PrinterOutlined style={{ fontSize: '16px' }} />}
+  >
+    Imprimir horário
+  </Button>
+)}
+<Modal
+  title="Selecione a quantidade de etiquetas"
+  visible={isModalVisible}
+  onOk={handleModalOk}
+  onCancel={handleModalCancel}
+>
+  <Select
+    defaultValue={1}
+    style={{ width: 120 }}
+    onChange={handleQuantityChange}
+  >
+    <Option value={1}>1</Option>
+    <Option value={2}>2</Option>
+    <Option value={3}>3</Option>
+  </Select>
+</Modal>
+{(aluno || professor) && (
+  <>
+    <Button
+      type="primary"
+      onClick={handleBaixarPDFClick}
+      style={{ marginLeft: "16px", background: "#cc0b00" }}
+    >
+      Baixar PDF
+    </Button>
+    <Button
+      type="primary"
+      onClick={() => setIsEmailInputVisible(true)}
+      style={{ marginLeft: "16px", background: "#cc0b00" }}
+    >
+      Enviar PDF por e-mail
+    </Button>
             {isEmailInputVisible && (
               <div style={{ marginTop: '16px' }}>
                 <Input

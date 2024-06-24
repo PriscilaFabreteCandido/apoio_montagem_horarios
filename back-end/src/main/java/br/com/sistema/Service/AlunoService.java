@@ -61,12 +61,18 @@ public class AlunoService {
 
     public AlunoDTO update(AlunoDTO alunoDTO, Long id){
 
-        if (repository.existsByMatricula(alunoDTO.getMatricula())) {
-            throw new BusinessException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+        AlunoDTO old = findById(id);
+
+        if(!alunoDTO.getMatricula().equals(old.getMatricula())){
+            if (repository.existsByMatricula(alunoDTO.getMatricula())) {
+                throw new BusinessException("Já existe um aluno com a matrícula '" + alunoDTO.getMatricula() + "'.");
+            }
+            if (professorRepository.existsByMatricula(alunoDTO.getMatricula())) {
+                throw new EntityNotFoundException("Já existe um professor com a matrícula '" + alunoDTO.getMatricula() + "'.");
+            }
         }
-        if (professorRepository.existsByMatricula(alunoDTO.getMatricula())) {
-            throw new EntityNotFoundException("Já existe um professor com a matrícula '" + alunoDTO.getMatricula() + "'.");
-        }
+
+
 
         findById(id);
 
@@ -90,6 +96,10 @@ public class AlunoService {
     public void delete(Long id) {
         Aluno aluno = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Aluno com ID '" + id + "' não encontrado."));
+
+        if(aluno.getAulas() != null){
+            throw new BusinessException("Este aluno possui aulas cadastradas e não pode ser excluido.");
+        }
 
         repository.delete(aluno);
 
